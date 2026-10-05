@@ -1,0 +1,2441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>chatteer - Worldwide Chat & Photo Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z' fill='%23F7DC4E'/><line x1='34' y1='28' x2='33' y2='52' stroke='%23262D36' stroke-width='7' stroke-linecap='round'/><line x1='55' y1='39' x2='80' y2='42' stroke='%23262D36' stroke-width='7' stroke-linecap='round'/><path d='M 29 60 Q 48 76 68 59' stroke='%23262D36' stroke-width='7' stroke-linecap='round' fill='none'/></svg>">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      touch-action: manipulation;
+    }
+    .brand-font {
+      font-family: 'Outfit', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(241, 245, 249, 0.8);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(165, 180, 252, 0.6);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(129, 140, 248, 0.8);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); }
+      50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.55); }
+    }
+    .spotlight-card {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col h-screen overflow-hidden select-none">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white/95 border-b border-slate-200/90 backdrop-blur-md px-3 sm:px-5 py-2.5 shrink-0 flex items-center justify-between z-20 shadow-sm">
+    <div class="flex items-center space-x-2.5 sm:space-x-3">
+      <!-- Mascot SVG from user drawing -->
+      <div class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 drop-shadow hover:scale-105 transition-transform cursor-pointer" title="chatteer mascot">
+        <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z" fill="#F7DC4E"/>
+          <line x1="34" y1="28" x2="33" y2="52" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+          <line x1="55" y1="39" x2="80" y2="42" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M 29 60 Q 48 76 68 59" stroke="#262D36" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <h1 class="brand-font text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+            chatteer
+          </h1>
+          <span class="px-2 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full flex items-center gap-1">
+            <span id="connection-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="connection-status">Connecting...</span>
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-500 hidden sm:flex items-center gap-1 font-medium">
+          Worldwide instant cloud network
+        </p>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="flex items-center gap-1.5 sm:gap-3">
+      <!-- Switch Page Navigation Toggle -->
+      <button id="page-nav-btn" type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold text-xs shadow-md shadow-indigo-500/20 hover:from-violet-500 hover:to-indigo-500 transition-all active:scale-95 cursor-pointer">
+        <span id="page-nav-icon">📸</span>
+        <span id="page-nav-label">To Photos</span>
+      </button>
+
+      <!-- Innovation 1: Permanent Device ID + Zero-Data Karma Badge -->
+      <div id="profile-toggle-btn" title="Permanent Device Identity & Verified Karma" class="flex items-center gap-2 px-2.5 py-1.5 rounded-2xl bg-gradient-to-r from-slate-100 to-amber-50/70 border border-slate-200/90 shadow-xs text-left select-none cursor-pointer">
+        <div class="relative">
+          <span id="user-avatar-badge" class="w-7 h-7 rounded-xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-center text-sm">🚀</span>
+          <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-1 ring-white"></span>
+        </div>
+        <div class="flex flex-col pr-1">
+          <div class="flex items-center gap-1">
+            <span id="user-karma-badge" class="text-[9px] font-extrabold uppercase tracking-wider text-amber-600 leading-none bg-amber-100/70 px-1 py-0.5 rounded-md">
+              🌱 0 Karma
+            </span>
+          </div>
+          <span id="user-name-badge" class="text-xs font-bold text-slate-800 max-w-[95px] sm:max-w-[130px] truncate leading-tight mt-0.5">@Loading...</span>
+        </div>
+      </div>
+
+      <!-- Online Indicator -->
+      <div id="peers-badge" title="Active worldwide network" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span id="peers-count">Live</span>
+      </div>
+
+      <!-- Sound notification toggle -->
+      <button id="sound-btn" type="button" title="Toggle audio cues" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors border border-slate-200 cursor-pointer">
+        <svg id="sound-icon-on" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+        <svg id="sound-icon-off" class="w-4 h-4 hidden text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- CHAT VIEW CONTAINER -->
+  <div id="view-chat" class="flex flex-col flex-1 overflow-hidden">
+    <!-- Channel Bar -->
+    <div class="bg-white/80 border-b border-slate-200 px-4 py-2 flex items-center justify-between text-xs text-slate-500">
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <span class="font-medium text-slate-400 mr-1 hidden sm:inline">Rooms:</span>
+        <button type="button" data-room="global" class="room-btn active px-3 py-1 rounded-lg bg-indigo-100/70 text-indigo-700 border border-indigo-300 font-semibold transition cursor-pointer">
+          # worldwide-general
+        </button>
+        <button type="button" data-room="chill" class="room-btn px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition cursor-pointer">
+          # chill-vibes
+        </button>
+        <button type="button" data-room="tech" class="room-btn px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition cursor-pointer">
+          # gaming-tech
+        </button>
+      </div>
+      <div class="flex items-center gap-2 text-slate-500 text-xs">
+        <span id="msg-counter" class="bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200 font-medium">0 messages</span>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <main class="flex-1 overflow-y-auto p-4 space-y-4 relative select-text bg-slate-50/60" id="chat-messages-container">
+      <div id="messages-loading" class="flex flex-col items-center justify-center py-20 text-slate-400 space-y-3">
+        <div class="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-sm font-medium">Connecting to worldwide cloud sync...</p>
+      </div>
+      
+      <div id="welcome-banner" class="hidden text-center max-w-md mx-auto py-8 px-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <div class="inline-flex w-14 h-14 mx-auto mb-2 drop-shadow-xs">
+          <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z" fill="#F7DC4E"/>
+            <line x1="34" y1="28" x2="33" y2="52" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+            <line x1="55" y1="39" x2="80" y2="42" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+            <path d="M 29 60 Q 48 76 68 59" stroke="#262D36" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-slate-800 brand-font text-lg">Welcome to chatteer live</h3>
+        <p class="text-xs text-slate-600 mt-1">Open this link on any phone or computer! Messages sync across all devices.</p>
+        <div class="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-700 font-medium">
+          <span>🛡</span> Strict safe chat active
+        </div>
+      </div>
+
+      <!-- Active message feed -->
+      <div id="messages-list" class="space-y-4 max-w-4xl mx-auto pb-4"></div>
+    </main>
+
+    <!-- Scroll Float Action -->
+    <div id="scroll-bottom-container" class="relative max-w-4xl mx-auto w-full pointer-events-none">
+      <button id="scroll-bottom-btn" type="button" class="pointer-events-auto absolute right-4 bottom-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-full shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition-all transform translate-y-10 opacity-0 cursor-pointer">
+        <span>Latest messages</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Chat Input Footer -->
+    <footer class="bg-white/95 border-t border-slate-200 p-3 sm:p-4 shrink-0 backdrop-blur-md z-20 shadow-sm">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center gap-1.5 pb-2 overflow-x-auto no-scrollbar text-lg">
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg hover:bg-slate-100 transition active:scale-90 cursor-pointer">👋</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg hover:bg-slate-100 transition active:scale-90 cursor-pointer">✨</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg hover:bg-slate-100 transition active:scale-90 cursor-pointer">🔥</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg hover:bg-slate-100 transition active:scale-90 cursor-pointer">🎉</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg hover:bg-slate-100 transition active:scale-90 cursor-pointer">❤️</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg hover:bg-slate-100 transition active:scale-90 cursor-pointer">🚀</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg hover:bg-slate-100 transition active:scale-90 cursor-pointer">😂</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg hover:bg-slate-100 transition active:scale-90 cursor-pointer">💯</button>
+        </div>
+
+        <!-- Attached Media Preview Strip -->
+        <div id="chat-attachment-bar" class="hidden mb-2 p-2 bg-indigo-50/80 border border-indigo-200 rounded-2xl flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <img id="chat-attachment-thumb" src="" alt="Attachment" class="w-12 h-12 rounded-xl object-cover border border-indigo-200 bg-white shadow-xs" />
+            <div class="flex flex-col min-w-0">
+              <span id="chat-attachment-type" class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Photo Attached</span>
+              <span id="chat-attachment-name" class="text-xs text-slate-700 font-medium truncate max-w-[200px] sm:max-w-xs">image.jpg</span>
+            </div>
+          </div>
+          <button id="chat-remove-attachment" type="button" class="p-1.5 rounded-xl hover:bg-indigo-100 text-slate-400 hover:text-slate-700 transition cursor-pointer" title="Remove attachment">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="chat-form" class="flex items-center gap-1.5 sm:gap-2">
+          <!-- Chat Media Upload Button -->
+          <label for="chat-image-input" title="Attach photo" class="p-2.5 rounded-2xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 border border-slate-200 transition cursor-pointer flex items-center justify-center shrink-0 active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <input id="chat-image-input" type="file" accept="image/*" class="hidden" />
+          </label>
+
+          <!-- GIF Picker Trigger Button -->
+          <button id="chat-gif-btn" type="button" title="Choose a GIF" class="px-2.5 py-2 rounded-2xl bg-gradient-to-r from-violet-500 to-indigo-600 hover:from-violet-600 hover:to-indigo-700 text-white font-black text-xs shadow-xs transition cursor-pointer flex items-center justify-center shrink-0 active:scale-95">
+            GIF
+          </button>
+
+          <div class="relative flex-1">
+            <input
+              id="message-input"
+              type="text"
+              maxlength="400"
+              placeholder="Type a message or send a GIF/photo..."
+              autocomplete="off"
+              class="w-full bg-slate-50 text-slate-900 placeholder-slate-400 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/80 focus:bg-white border border-slate-200 transition shadow-inner"
+            />
+            <span id="char-limit" class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none hidden sm:inline">400</span>
+          </div>
+
+          <button
+            type="submit"
+            id="send-button"
+            disabled
+            class="bg-indigo-600 disabled:opacity-40 disabled:hover:bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 sm:px-6 py-3 rounded-2xl transition shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-1.5 text-sm active:scale-95 cursor-pointer"
+          >
+            <span class="hidden sm:inline font-bold">Send</span>
+            <svg class="w-4 h-4 transform rotate-90" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </footer>
+  </div>
+
+  <!-- GIF PICKER MODAL -->
+  <div id="gif-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-4 sm:p-5 border border-slate-200 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🎬</span>
+          <h3 class="font-black brand-font text-lg text-slate-800">Choose a GIF</h3>
+        </div>
+        <button id="close-gif-modal" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">✕</button>
+      </div>
+
+      <!-- Quick Category Buttons -->
+      <div class="flex items-center gap-1.5 py-3 overflow-x-auto no-scrollbar text-xs">
+        <button type="button" data-gif-cat="trending" class="gif-cat-btn active px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold transition shrink-0 cursor-pointer">🔥 Trending</button>
+        <button type="button" data-gif-cat="laugh" class="gif-cat-btn px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition shrink-0 cursor-pointer">😂 Laugh</button>
+        <button type="button" data-gif-cat="cheer" class="gif-cat-btn px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition shrink-0 cursor-pointer">🎉 Hype</button>
+        <button type="button" data-gif-cat="mindblown" class="gif-cat-btn px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition shrink-0 cursor-pointer">🤯 Wow</button>
+        <button type="button" data-gif-cat="cats" class="gif-cat-btn px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition shrink-0 cursor-pointer">🐱 Cats</button>
+        <button type="button" data-gif-cat="dance" class="gif-cat-btn px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition shrink-0 cursor-pointer">💃 Dance</button>
+      </div>
+
+      <!-- Custom GIF / Image Link Input -->
+      <div class="flex items-center gap-2 pb-3">
+        <input
+          id="custom-gif-url-input"
+          type="url"
+          placeholder="Paste any direct GIF or Image URL..."
+          class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+        />
+        <button id="apply-custom-gif-btn" type="button" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer">
+          Use
+        </button>
+      </div>
+
+      <!-- GIF Grid Feed -->
+      <div id="gif-grid" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-1 rounded-2xl bg-slate-50 border border-slate-100 min-h-[220px]"></div>
+    </div>
+  </div>
+
+  <!-- PHOTOS VIEW CONTAINER -->
+  <div id="view-photos" class="hidden flex flex-col flex-1 overflow-hidden bg-slate-50">
+    <div class="bg-white border-b border-slate-200 px-3 sm:px-6 py-3 shrink-0 shadow-xs">
+      <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <!-- Search input -->
+        <div class="relative flex-1 max-w-lg">
+          <input
+            id="photo-search-input"
+            type="text"
+            placeholder="Search photos by title or @creator..."
+            class="w-full bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 pl-10 pr-4 py-2 rounded-2xl text-xs sm:text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-inner"
+          />
+          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+
+        <!-- Post Photo button -->
+        <div class="flex items-center gap-2">
+          <button id="open-upload-btn" type="button" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-500/25 hover:from-pink-500 hover:to-indigo-500 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Post Photo</span>
+            <span class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-semibold">HD</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Innovation 2: Slow-Drop Showcase Banner & Filter Tabs -->
+      <div class="max-w-6xl mx-auto mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
+        <div class="flex items-center gap-1.5">
+          <button type="button" id="filter-all-btn" class="photo-filter-tab active px-3 py-1 rounded-xl bg-indigo-600 text-white font-bold text-xs transition cursor-pointer">
+            🌍 All Photos
+          </button>
+          <button type="button" id="filter-spotlight-btn" class="photo-filter-tab px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer flex items-center gap-1">
+            <span>✨ Slow-Drop Spotlight</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+          </button>
+          <button type="button" id="filter-hangouts-btn" class="photo-filter-tab px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer flex items-center gap-1">
+            <span>🔥 Live Hangouts</span>
+          </button>
+        </div>
+
+        <!-- Slow Drop Countdown Timer -->
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
+          <span>⏳ Next Drop in:</span>
+          <span id="slow-drop-timer" class="font-mono font-bold text-amber-900">42:15</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photo Feed Gallery -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6" id="photo-feed-container">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <h2 id="gallery-header-title" class="text-base sm:text-lg font-bold brand-font text-slate-800">Worldwide Photo Showcase</h2>
+            <span id="photo-count-badge" class="px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600 text-xs font-semibold">0 photos</span>
+          </div>
+          <span class="text-xs text-slate-400">Authentic Non-Algorithmic Feed</span>
+        </div>
+
+        <!-- Cards Grid -->
+        <div id="photo-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
+
+        <!-- Empty state placeholder -->
+        <div id="photo-empty-state" class="hidden text-center py-16 px-4 bg-white rounded-2xl border border-slate-200 mt-4 shadow-sm">
+          <div class="text-4xl mb-2">📸</div>
+          <h3 class="font-bold text-slate-800 text-base">No photos found</h3>
+          <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Upload a picture from your camera roll or paste an image link to be the first creator on the feed!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST PHOTO MODAL -->
+  <div id="upload-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 border border-slate-200 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📷</span>
+          <h3 class="font-black brand-font text-lg text-slate-800">Post a Photo</h3>
+        </div>
+        <button id="close-upload-modal" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">✕</button>
+      </div>
+
+      <!-- Mode Selector Tabs: Image File vs Image URL -->
+      <div class="flex items-center bg-slate-100 p-1 rounded-xl mb-3 text-xs font-bold">
+        <button id="tab-mode-file" type="button" class="flex-1 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 transition cursor-pointer">
+          📁 Device Photo
+        </button>
+        <button id="tab-mode-url" type="button" class="flex-1 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">
+          🔗 Web Image Link
+        </button>
+      </div>
+
+      <form id="upload-form" class="space-y-3">
+        <!-- File Upload Section -->
+        <div id="file-upload-section">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pick a Photo</label>
+          <div class="relative border-2 border-dashed border-indigo-200 hover:border-indigo-400 rounded-2xl p-4 text-center bg-indigo-50/40 transition">
+            <input id="photo-file-input" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            <div id="photo-file-preview-info" class="space-y-1">
+              <span class="text-2xl">🖼️</span>
+              <p class="text-xs font-semibold text-slate-700" id="file-name-label">Tap to take photo or choose from library</p>
+              <p class="text-[11px] text-slate-400" id="file-size-label">JPG, PNG, WebP, GIF supported</p>
+            </div>
+          </div>
+          <!-- Preview thumbnail -->
+          <div id="photo-file-preview-wrap" class="hidden mt-2 relative rounded-xl overflow-hidden max-h-36 bg-slate-100 border border-slate-200">
+            <img id="photo-file-preview-img" src="" alt="Selected image preview" class="w-full h-36 object-contain" />
+          </div>
+        </div>
+
+        <!-- URL Input Section -->
+        <div id="url-upload-section" class="hidden">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Direct Image URL</label>
+          <input
+            id="photo-url-input"
+            type="url"
+            placeholder="https://images.unsplash.com/... or https://i.imgur.com/..."
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+          />
+          <p class="text-[10px] text-slate-400 mt-1">Paste any public web image URL (.jpg, .png, .webp, .gif).</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Title</label>
+          <input
+            id="photo-title-input"
+            type="text"
+            maxlength="100"
+            required
+            placeholder="Give your photo an engaging title..."
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+          />
+        </div>
+
+        <!-- Upload Progress Indicator -->
+        <div id="upload-progress-box" class="hidden p-3 rounded-xl bg-indigo-50 border border-indigo-200 space-y-1.5">
+          <div class="flex items-center justify-between text-xs font-semibold text-indigo-900">
+            <span id="upload-status-text">Processing and sharing image...</span>
+            <span id="upload-status-pct">0%</span>
+          </div>
+          <div class="w-full bg-indigo-200/60 rounded-full h-1.5 overflow-hidden">
+            <div id="upload-progress-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-300 w-0"></div>
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-800 flex items-start gap-2">
+          <span>⚡</span>
+          <span>Photos automatically create a <strong>24-Hour Live Hangout</strong> chat under your device ID (<strong id="upload-author-badge">@You</strong>).</span>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button id="cancel-upload-btn" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition cursor-pointer">Cancel</button>
+          <button id="submit-photo-btn" type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-pink-600/30 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            <span id="submit-btn-spinner" class="hidden w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <span id="submit-btn-text">Publish Worldwide</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LIVING PHOTO LIGHTBOX WITH REAL-TIME LIVE HANGOUT CHAT -->
+  <div id="viewer-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row border border-slate-200 max-h-[92vh]">
+      
+      <!-- Left Column: Photo & Stats -->
+      <div class="md:w-3/5 flex flex-col bg-slate-950 relative border-b md:border-b-0 md:border-r border-slate-800">
+        <div class="relative flex-1 flex items-center justify-center p-2 min-h-[260px] max-h-[50vh] md:max-h-full">
+          <img
+            id="active-photo-viewer"
+            src=""
+            alt="Enlarged photo view"
+            class="max-h-[48vh] md:max-h-[75vh] w-full object-contain"
+          />
+          <button id="close-viewer-btn" type="button" class="absolute top-3 right-3 bg-black/70 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold z-30 cursor-pointer transition">✕</button>
+        </div>
+
+        <!-- Photo Actions Bar -->
+        <div class="p-3 bg-slate-900/90 text-white flex items-center justify-between text-xs border-t border-slate-800">
+          <div class="flex items-center gap-3">
+            <button id="modal-like-btn" type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600/30 hover:bg-pink-600/50 text-pink-300 font-bold border border-pink-500/40 transition active:scale-95 cursor-pointer">
+              <span id="modal-like-icon">🤍</span>
+              <span id="modal-like-count">0</span>
+            </button>
+            <span id="modal-photo-views" class="font-semibold text-slate-300">👁️ 0 views</span>
+          </div>
+
+          <a id="modal-photo-direct-link" href="#" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+            <span>HD Full</span>
+            <span>↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Living Photo Hangout (Live Chat Dedicated to this Photo) -->
+      <div class="md:w-2/5 flex flex-col bg-white overflow-hidden max-h-[42vh] md:max-h-[85vh]">
+        
+        <!-- Header Info -->
+        <div class="p-4 border-b border-slate-100 flex flex-col gap-2 shrink-0 bg-slate-50/60">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h2 id="modal-photo-title" class="text-base font-extrabold text-slate-800 brand-font line-clamp-1">Photo Title</h2>
+              <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
+                <span id="modal-photo-avatar">🚀</span>
+                <span id="modal-photo-author" class="font-bold text-slate-700">@Creator</span>
+                <span id="modal-author-karma-badge" class="px-1.5 py-0.2 rounded-md bg-amber-100 text-amber-800 text-[10px] font-extrabold">🌱 Karma 0</span>
+              </div>
+            </div>
+            
+            <!-- Hangout Live Status Pill -->
+            <div id="hangout-status-pill" class="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+              <span id="hangout-time-left">24h Hangout</span>
+            </div>
+          </div>
+
+          <!-- Interactive 5-Star Rating Row -->
+          <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-xs">
+            <div class="flex items-center gap-1 text-base">
+              <button type="button" data-star="1" class="star-btn text-slate-300 hover:text-amber-400 cursor-pointer">★</button>
+              <button type="button" data-star="2" class="star-btn text-slate-300 hover:text-amber-400 cursor-pointer">★</button>
+              <button type="button" data-star="3" class="star-btn text-slate-300 hover:text-amber-400 cursor-pointer">★</button>
+              <button type="button" data-star="4" class="star-btn text-slate-300 hover:text-amber-400 cursor-pointer">★</button>
+              <button type="button" data-star="5" class="star-btn text-slate-300 hover:text-amber-400 cursor-pointer">★</button>
+              <span id="modal-rating-avg" class="text-xs font-bold text-amber-600 ml-1">★ 0.0</span>
+            </div>
+            <span id="modal-user-rated-status" class="text-[10px] text-slate-400 font-semibold">Tap star to award karma</span>
+          </div>
+        </div>
+
+        <!-- Hangout Real-time Messages Stream -->
+        <div id="hangout-messages-list" class="flex-1 overflow-y-auto p-3.5 space-y-2.5 text-xs bg-slate-50/40">
+          <div id="hangout-empty-hint" class="text-center py-8 text-slate-400">
+            <span class="text-2xl block mb-1">💬</span>
+            <p class="font-medium">No one in this hangout yet!</p>
+            <p class="text-[11px] text-slate-400">Be the first to chat about this photo.</p>
+          </div>
+        </div>
+
+        <!-- Hangout Input Form -->
+        <form id="hangout-chat-form" class="p-3 border-t border-slate-100 bg-white flex items-center gap-2 shrink-0">
+          <input
+            id="hangout-msg-input"
+            type="text"
+            maxlength="200"
+            placeholder="Say something about this photo..."
+            class="flex-1 bg-slate-100 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+          />
+          <button
+            type="submit"
+            id="hangout-send-btn"
+            class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-xs transition active:scale-95 cursor-pointer"
+          >
+            Reply
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed top-16 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script type="module">
+    // --- PERMANENT MODERATION BLACKLIST ---
+    // Any usernames listed here are permanently banned from posting, chatting, and viewing
+    const BANNED_USERS = new Set([
+      'turboviper_1118'
+    ]);
+
+    function isUserBanned(username) {
+      if (!username) return false;
+      const clean = String(username).toLowerCase().replace(/^@/, '').trim();
+      return BANNED_USERS.has(clean);
+    }
+
+    // --- INDEXEDDB STORAGE FOR HIGH-RESOLUTION LOCAL IMAGES ---
+    const IDB_NAME = 'chatteer_photos_db';
+    const IDB_VERSION = 1;
+    const IDB_STORE = 'photos';
+
+    function openIDB() {
+      return new Promise((resolve) => {
+        if (!('indexedDB' in window)) {
+          resolve(null);
+          return;
+        }
+        const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(IDB_STORE)) {
+            db.createObjectStore(IDB_STORE, { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    async function savePhotoToIDB(id, dataUrl) {
+      try {
+        const db = await openIDB();
+        if (!db) return false;
+        return new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, 'readwrite');
+          tx.objectStore(IDB_STORE).put({ id, dataUrl, savedAt: Date.now() });
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        });
+      } catch (err) {
+        return false;
+      }
+    }
+
+    async function getPhotoFromIDB(id) {
+      try {
+        const db = await openIDB();
+        if (!db) return null;
+        return new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, 'readonly');
+          const req = tx.objectStore(IDB_STORE).get(id);
+          req.onsuccess = () => resolve(req.result ? req.result.dataUrl : null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (err) {
+        return null;
+      }
+    }
+
+    // --- PERMANENT UNIQUE IDENTITY & ZERO-DATA KARMA ---
+    const AVATAR_OPTIONS = ['🚀', '🦊', '⚡', '👾', '🌺', '🪐', '🐱', '🍕', '🐼', '💎', '🎸', '🌈', '🐯', '🌟', '🐬', '🍀'];
+    const ADJECTIVES = [
+      'Swift', 'Cosmic', 'Pixel', 'Nova', 'Hyper', 'Neon', 'Aero', 'Solar', 'Echo', 'Apex',
+      'Quantum', 'Frost', 'Vortex', 'Cyber', 'Shadow', 'Blaze', 'Stellar', 'Turbo', 'Mystic', 'Iron',
+      'Zenith', 'Prism', 'Orbit', 'Pulse', 'Astro', 'Flare', 'Cobalt', 'Sonic', 'Titan', 'Zephyr'
+    ];
+    const NOUNS = [
+      'Pilot', 'Fox', 'Rider', 'Spark', 'Rover', 'Wave', 'Ninja', 'Falcon', 'Orbit', 'Wolf',
+      'Phoenix', 'Tiger', 'Comet', 'Knight', 'Ranger', 'Striker', 'Titan', 'Drifter', 'Ghost', 'Scout',
+      'Voyager', 'Falcon', 'Hawk', 'Hunter', 'Echo', 'Legend', 'Matrix', 'Lynx', 'Viper', 'Beacon'
+    ];
+
+    let myProfile = {
+      name: '',
+      avatar: '🚀',
+      karma: 0
+    };
+
+    function calculateKarmaForUser(username) {
+      if (!username) return 0;
+      let totalKarma = 0;
+
+      allPhotos.forEach(p => {
+        if (p.author === username && !isUserBanned(p.author)) {
+          totalKarma += (p.likes || 0) * 10;
+          if (p.ratings && typeof p.ratings === 'object') {
+            Object.values(p.ratings).forEach(score => {
+              if (score >= 5) totalKarma += 20;
+              else if (score >= 4) totalKarma += 10;
+            });
+          }
+        }
+      });
+
+      const myMsgs = allMessages.filter(m => m.userName === username).length;
+      totalKarma += Math.min(myMsgs * 2, 80);
+
+      return totalKarma;
+    }
+
+    function getKarmaFlair(karma) {
+      if (karma >= 250) return { icon: '👑', label: 'Chatteer Legend', cls: 'bg-amber-100 text-amber-800' };
+      if (karma >= 100) return { icon: '🌟', label: 'Community Star', cls: 'bg-indigo-100 text-indigo-800' };
+      if (karma >= 25) return { icon: '⚡', label: 'Active Vibe', cls: 'bg-violet-100 text-violet-800' };
+      return { icon: '🌱', label: 'Newcomer', cls: 'bg-emerald-50 text-emerald-700' };
+    }
+
+    function generateCandidateName() {
+      let candidate = '';
+      do {
+        const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+        const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+        const num = Math.floor(1000 + Math.random() * 9000);
+        candidate = `${adj}${noun}_${num}`;
+      } while (isUserBanned(candidate));
+      return candidate;
+    }
+
+    function initPermanentIdentity() {
+      try {
+        const storedName = localStorage.getItem('chatteer_perm_username');
+        const storedAvatar = localStorage.getItem('chatteer_perm_avatar');
+
+        if (storedName && !isUserBanned(storedName) && storedAvatar) {
+          myProfile.name = storedName;
+          myProfile.avatar = storedAvatar;
+          updateProfileUI();
+          return;
+        }
+
+        const newName = generateCandidateName();
+        const newAvatar = AVATAR_OPTIONS[Math.floor(Math.random() * AVATAR_OPTIONS.length)];
+
+        myProfile.name = newName;
+        myProfile.avatar = newAvatar;
+
+        localStorage.setItem('chatteer_perm_username', newName);
+        localStorage.setItem('chatteer_perm_avatar', newAvatar);
+      } catch (e) {
+        if (!myProfile.name) {
+          myProfile.name = `Pilot_${Math.floor(1000 + Math.random() * 9000)}`;
+        }
+      }
+      updateProfileUI();
+    }
+
+    // --- APPLICATION STATE ---
+    let currentRoom = 'global';
+    let soundEnabled = true;
+    let allMessages = [];
+    let isAutoScrollActive = true;
+    let activeEventSource = null;
+
+    let currentTab = 'chat';
+    let currentFilter = 'all';
+    let allPhotos = [];
+    let selectedImageBase64 = null;
+    let photoEventSource = null;
+    let currentActivePhoto = null;
+    let currentUploadMode = 'file';
+
+    let hangoutEventSource = null;
+    let currentHangoutMessages = [];
+    let activeChatAttachment = null;
+
+    const POPULAR_GIFS = {
+      trending: [
+        { url: 'https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif', title: 'Cat Popcorn' },
+        { url: 'https://media.giphy.com/media/artj92V8o75VPL7AeQ/giphy.gif', title: 'Happy Dance' },
+        { url: 'https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif', title: 'Thumbs Up' },
+        { url: 'https://media.giphy.com/media/blSTtZehjAZ8I/giphy.gif', title: 'Cool Shades' },
+        { url: 'https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif', title: 'Party Confetti' },
+        { url: 'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif', title: 'Applause' }
+      ],
+      laugh: [
+        { url: 'https://media.giphy.com/media/10JhviFuU2gWD6/giphy.gif', title: 'LOL Laugh' },
+        { url: 'https://media.giphy.com/media/GCO2SGLu4Zea4/giphy.gif', title: 'Giggle' },
+        { url: 'https://media.giphy.com/media/3oEjHAUOqG3lSS0f1C/giphy.gif', title: 'Chuckle' },
+        { url: 'https://media.giphy.com/media/ZqlvCTNHpqrio/giphy.gif', title: 'Wheezing' },
+        { url: 'https://media.giphy.com/media/ltIFdjNAasOwVvKhvx/giphy.gif', title: 'Rolling Laugh' },
+        { url: 'https://media.giphy.com/media/dC9DTdqPmRnlS/giphy.gif', title: 'Big Smile' }
+      ],
+      cheer: [
+        { url: 'https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif', title: 'Excited Yay' },
+        { url: 'https://media.giphy.com/media/artj92V8o75VPL7AeQ/giphy.gif', title: 'Celebration' },
+        { url: 'https://media.giphy.com/media/kyLYXonQYYfwYDIeZl/giphy.gif', title: 'Cheers' },
+        { url: 'https://media.giphy.com/media/IwAZ6dvvvaNN6/giphy.gif', title: 'Lets Go' },
+        { url: 'https://media.giphy.com/media/g9582DNuQppxC/giphy.gif', title: 'Leonardo Toast' },
+        { url: 'https://media.giphy.com/media/l41lI4bYmcsPJX9Go/giphy.gif', title: 'High Five' }
+      ],
+      mindblown: [
+        { url: 'https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif', title: 'Mind Blown' },
+        { url: 'https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif', title: 'Space Head' },
+        { url: 'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', title: 'Shocked' },
+        { url: 'https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif', title: 'Blinking Guy' },
+        { url: 'https://media.giphy.com/media/Um3ljJl8jrnHy/giphy.gif', title: 'No Way' },
+        { url: 'https://media.giphy.com/media/EldfH1VJdbrwY/giphy.gif', title: 'Surprise' }
+      ],
+      cats: [
+        { url: 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif', title: 'Typing Cat' },
+        { url: 'https://media.giphy.com/media/BzyTuYCmvSORqs1ABM/giphy.gif', title: 'Vibing Cat' },
+        { url: 'https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif', title: 'Curious Cat' },
+        { url: 'https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif', title: 'Happy Kitten' },
+        { url: 'https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif', title: 'Shocked Cat' },
+        { url: 'https://media.giphy.com/media/Nm8ZPAGOwZUQM/giphy.gif', title: 'Sleepy Cat' }
+      ],
+      dance: [
+        { url: 'https://media.giphy.com/media/mKMGLhoD8L4yc/giphy.gif', title: 'Groovy' },
+        { url: 'https://media.giphy.com/media/blSTtZehjAZ8I/giphy.gif', title: 'Smooth Moves' },
+        { url: 'https://media.giphy.com/media/GeimqsH0TLDt4tScGw/giphy.gif', title: 'Vibe Dance' },
+        { url: 'https://media.giphy.com/media/7FrOU9tPbgAZtxV5mb/giphy.gif', title: 'Party Shuffle' },
+        { url: 'https://media.giphy.com/media/DhstvI3CH03DO/giphy.gif', title: 'Happy Dance' },
+        { url: 'https://media.giphy.com/media/13hxeOYjoTWtK8/giphy.gif', title: 'Carlton Dance' }
+      ]
+    };
+
+    // --- SAFETY FILTERS AND WORD SANITIZATION ---
+    const BAD_WORD_LIST = [
+      'discord',
+      'fuck', 'fucking', 'fucked', 'fucker', 'fuckin', 'fck', 'fuk',
+      'shit', 'shitty', 'shitting', 'bullshit', 'shite',
+      'bitch', 'bitches', 'bitching', 'bitchy',
+      'ass', 'asshole', 'assholes', 'dumbass', 'jackass', 'badass', 'arse', 'arsehole',
+      'bastard', 'bastards',
+      'damn', 'dammit', 'damned',
+      'crap', 'crappy',
+      'hell',
+      'piss', 'pissed', 'pissing',
+      'dick', 'dicks', 'dickhead',
+      'cock', 'cocks', 'cocksucker',
+      'pussy', 'pussies',
+      'cunt', 'cunts',
+      'whore', 'whores',
+      'slut', 'sluts', 'slutty',
+      'douche', 'douchebag',
+      'retard', 'retarded',
+      'fag', 'faggot', 'faggots',
+      'nazi', 'hitler',
+      'porn', 'porno', 'pornography', 'xxx', 'hentai',
+      'nsfw', 'nude', 'nudes', 'naked', 'nudity',
+      'sex', 'sexy',
+      'boob', 'boobs', 'tit', 'tits', 'titties',
+      'penis', 'vagina'
+    ];
+    const BAD_WORD_SET = new Set(BAD_WORD_LIST);
+
+    const ADVANCED_PATTERNS = [
+      /\bd[1i!|][s5$][c(][o0]rd\b/gi,
+      /d+[._\s-]*i+[._\s-]*s+[._\s-]*c+[._\s-]*o+[._\s-]*r+[._\s-]*d+/gi,
+      /f+[._\s-]*[u*]+[._\s-]*c+[._\s-]*k+[a-z]*/gi,
+      /s+[._\s-]*h+[._\s-]*[i!1*]+[._\s-]*t+[a-z]*/gi,
+      /b+[._\s-]*[i!1*]+[._\s-]*t+[._\s-]*c+[._\s-]*h+[a-z]*/gi,
+      /\b(a+[._\s-]*[s$5*]+[._\s-]*[s$5*]+(h+[o0]+l+e+s?|e+s?|h+e+a+d+)?)\b/gi,
+      /b+[._\s-]*a+[._\s-]*s+[._\s-]*t+[._\s-]*a+[._\s-]*r+[._\s-]*d+[a-z]*/gi,
+      /d+[._\s-]*[i!1]+[._\s-]*c+[._\s-]*k+[a-z]*/gi,
+      /c+[._\s-]*[o0]+[._\s-]*c+[._\s-]*k+[a-z]*/gi,
+      /p+[._\s-]*u+[._\s-]*s+[._\s-]*s+[._\s-]*y+/gi,
+      /c+[._\s-]*u+[._\s-]*n+[._\s-]*t+[a-z]*/gi,
+      /w+[._\s-]*h+[._\s-]*[o0]+[._\s-]*r+[._\s-]*e+[a-z]*/gi,
+      /s+[._\s-]*l+[._\s-]*u+[._\s-]*t+[a-z]*/gi,
+      /d+[._\s-]*a+[._\s-]*m+[._\s-]*n+[a-z]*/gi,
+      /p+[._\s-]*[i!1]+[._\s-]*s+[._\s-]*s+[a-z]*/gi,
+      /d+[._\s-]*o+[._\s-]*u+[._\s-]*c+[._\s-]*h+[._\s-]*e+/gi,
+      /r+[._\s-]*e+[._\s-]*t+[._\s-]*a+[._\s-]*r+[._\s-]*d+/gi,
+      /f+[._\s-]*a+[._\s-]*g+[a-z]*/gi,
+      /\b(p+[._\s-]*o+[._\s-]*r+[._\s-]*n+[o0]?|n+[._\s-]*u+[._\s-]*d+[._\s-]*e+s?|s+[._\s-]*e+[._\s-]*x+y?|h+[._\s-]*e+[._\s-]*n+[._\s-]*t+[._\s-]*a+[._\s-]*[i!]|x{3,}|n+s+f+w)\b/gi
+    ];
+
+    function normalizeLeetspeak(str) {
+      return str
+        .toLowerCase()
+        .replace(/[@4]/g, 'a')
+        .replace(/[$5]/g, 's')
+        .replace(/[0]/g, 'o')
+        .replace(/[1!|]/g, 'i')
+        .replace(/[3]/g, 'e')
+        .replace(/[7+]/g, 't')
+        .replace(/[8]/g, 'b');
+    }
+
+    function sanitizeContent(text) {
+      if (!text) return '';
+      let filtered = String(text);
+
+      ADVANCED_PATTERNS.forEach((pattern) => {
+        filtered = filtered.replace(pattern, (match) => '#'.repeat(match.length));
+      });
+
+      filtered = filtered.replace(/[^\s]+/g, (token) => {
+        if (/^#+$/.test(token)) return token;
+        const prefix = token.match(/^[^\w]+/)?.[0] || '';
+        const suffix = token.match(/[^\w]+$/)?.[0] || '';
+        const rawCore = token.slice(prefix.length, token.length - suffix.length);
+        if (!rawCore) return token;
+
+        const normalizedCore = normalizeLeetspeak(rawCore).replace(/[\W_]+/g, '');
+        if (BAD_WORD_SET.has(normalizedCore)) {
+          return prefix + '#'.repeat(rawCore.length) + suffix;
+        }
+        return token;
+      });
+
+      return filtered;
+    }
+
+    // --- DOM REFERENCES ---
+    const chatContainer = document.getElementById('chat-messages-container');
+    const messagesList = document.getElementById('messages-list');
+    const loadingElem = document.getElementById('messages-loading');
+    const welcomeBanner = document.getElementById('welcome-banner');
+    const statusText = document.getElementById('connection-status');
+    const connectionDot = document.getElementById('connection-dot');
+    const peersBadge = document.getElementById('peers-badge');
+    const peersCount = document.getElementById('peers-count');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const scrollBottomBtn = document.getElementById('scroll-bottom-btn');
+    const msgCounter = document.getElementById('msg-counter');
+    const profileToggleBtn = document.getElementById('profile-toggle-btn');
+    const userNameBadge = document.getElementById('user-name-badge');
+    const userAvatarBadge = document.getElementById('user-avatar-badge');
+    const userKarmaBadge = document.getElementById('user-karma-badge');
+    const soundBtn = document.getElementById('sound-btn');
+    const soundIconOn = document.getElementById('sound-icon-on');
+    const soundIconOff = document.getElementById('sound-icon-off');
+
+    const pageNavBtn = document.getElementById('page-nav-btn');
+    const pageNavIcon = document.getElementById('page-nav-icon');
+    const pageNavLabel = document.getElementById('page-nav-label');
+    const viewChat = document.getElementById('view-chat');
+    const viewPhotos = document.getElementById('view-photos');
+    const photoGrid = document.getElementById('photo-grid');
+    const photoEmptyState = document.getElementById('photo-empty-state');
+    const photoCountBadge = document.getElementById('photo-count-badge');
+    const photoSearchInput = document.getElementById('photo-search-input');
+    const galleryHeaderTitle = document.getElementById('gallery-header-title');
+    const filterAllBtn = document.getElementById('filter-all-btn');
+    const filterSpotlightBtn = document.getElementById('filter-spotlight-btn');
+    const filterHangoutsBtn = document.getElementById('filter-hangouts-btn');
+    const slowDropTimer = document.getElementById('slow-drop-timer');
+
+    const openUploadBtn = document.getElementById('open-upload-btn');
+    const uploadModal = document.getElementById('upload-modal');
+    const closeUploadModal = document.getElementById('close-upload-modal');
+    const cancelUploadBtn = document.getElementById('cancel-upload-btn');
+    const uploadForm = document.getElementById('upload-form');
+    const photoFileInput = document.getElementById('photo-file-input');
+    const photoTitleInput = document.getElementById('photo-title-input');
+    const fileNameLabel = document.getElementById('file-name-label');
+    const fileSizeLabel = document.getElementById('file-size-label');
+    const uploadAuthorBadge = document.getElementById('upload-author-badge');
+    const photoFilePreviewWrap = document.getElementById('photo-file-preview-wrap');
+    const photoFilePreviewImg = document.getElementById('photo-file-preview-img');
+
+    const tabModeFile = document.getElementById('tab-mode-file');
+    const tabModeUrl = document.getElementById('tab-mode-url');
+    const fileUploadSection = document.getElementById('file-upload-section');
+    const urlUploadSection = document.getElementById('url-upload-section');
+    const photoUrlInput = document.getElementById('photo-url-input');
+    const uploadProgressBox = document.getElementById('upload-progress-box');
+    const uploadStatusText = document.getElementById('upload-status-text');
+    const uploadStatusPct = document.getElementById('upload-status-pct');
+    const uploadProgressBar = document.getElementById('upload-progress-bar');
+    const submitBtnSpinner = document.getElementById('submit-btn-spinner');
+    const submitBtnText = document.getElementById('submit-btn-text');
+
+    const viewerModal = document.getElementById('viewer-modal');
+    const activePhotoViewer = document.getElementById('active-photo-viewer');
+    const closeViewerBtn = document.getElementById('close-viewer-btn');
+    const modalPhotoTitle = document.getElementById('modal-photo-title');
+    const modalPhotoViews = document.getElementById('modal-photo-views');
+    const modalPhotoAvatar = document.getElementById('modal-photo-avatar');
+    const modalPhotoAuthor = document.getElementById('modal-photo-author');
+    const modalAuthorKarmaBadge = document.getElementById('modal-author-karma-badge');
+    const modalPhotoDirectLink = document.getElementById('modal-photo-direct-link');
+    const modalLikeBtn = document.getElementById('modal-like-btn');
+    const modalLikeCount = document.getElementById('modal-like-count');
+    const modalLikeIcon = document.getElementById('modal-like-icon');
+    const hangoutTimeLeft = document.getElementById('hangout-time-left');
+    const hangoutMessagesList = document.getElementById('hangout-messages-list');
+    const hangoutEmptyHint = document.getElementById('hangout-empty-hint');
+    const hangoutChatForm = document.getElementById('hangout-chat-form');
+    const hangoutMsgInput = document.getElementById('hangout-msg-input');
+
+    const chatAttachmentBar = document.getElementById('chat-attachment-bar');
+    const chatAttachmentThumb = document.getElementById('chat-attachment-thumb');
+    const chatAttachmentType = document.getElementById('chat-attachment-type');
+    const chatAttachmentName = document.getElementById('chat-attachment-name');
+    const chatRemoveAttachment = document.getElementById('chat-remove-attachment');
+    const chatImageInput = document.getElementById('chat-image-input');
+    const chatGifBtn = document.getElementById('chat-gif-btn');
+    const gifModal = document.getElementById('gif-modal');
+    const closeGifModal = document.getElementById('close-gif-modal');
+    const gifGrid = document.getElementById('gif-grid');
+    const customGifUrlInput = document.getElementById('custom-gif-url-input');
+    const applyCustomGifBtn = document.getElementById('apply-custom-gif-btn');
+
+    // --- ACCURATE UNIQUE VIEW & SINGLE LIKE UTILITIES ---
+    function recordUniqueView(photoId) {
+      try {
+        const viewed = JSON.parse(localStorage.getItem('chatteer_viewed_ids_v1') || '[]');
+        if (!viewed.includes(photoId)) {
+          viewed.push(photoId);
+          localStorage.setItem('chatteer_viewed_ids_v1', JSON.stringify(viewed));
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function userHasLikedPhoto(photo) {
+      if (!photo) return false;
+      if (photo.likedBy && typeof photo.likedBy === 'object') {
+        return !!photo.likedBy[myProfile.name];
+      }
+      return false;
+    }
+
+    function updateModalLikeDisplay(photo) {
+      if (!modalLikeBtn || !modalLikeCount) return;
+      const liked = userHasLikedPhoto(photo);
+      modalLikeCount.textContent = photo.likes || 0;
+
+      if (liked) {
+        modalLikeBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600 text-white font-bold border border-pink-700 transition active:scale-95 cursor-pointer';
+        if (modalLikeIcon) modalLikeIcon.textContent = '❤️';
+      } else {
+        modalLikeBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600/30 hover:bg-pink-600/50 text-pink-300 font-bold border border-pink-500/40 transition active:scale-95 cursor-pointer';
+        if (modalLikeIcon) modalLikeIcon.textContent = '🤍';
+      }
+    }
+
+    // --- SLOW DROP TIMER SIMULATION ---
+    function startSlowDropTimer() {
+      if (!slowDropTimer) return;
+      setInterval(() => {
+        const now = new Date();
+        const minsLeft = 59 - now.getMinutes();
+        const secsLeft = 59 - now.getSeconds();
+        slowDropTimer.textContent = `${String(minsLeft).padStart(2, '0')}:${String(secsLeft).padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    // --- COMPRESSION AND LIGHTWEIGHT CDN UPLOAD ---
+    function compressImageFile(file, maxWidth = 1200, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedDataUrl);
+          };
+          img.onerror = () => reject(new Error('Failed to load image'));
+        };
+        reader.onerror = () => reject(new Error('Failed to read file'));
+      });
+    }
+
+    async function uploadImageToCDN(file) {
+      if (uploadProgressBox) uploadProgressBox.classList.remove('hidden');
+      if (uploadStatusText) uploadStatusText.textContent = 'Uploading to global CDN...';
+      if (uploadStatusPct) uploadStatusPct.textContent = '35%';
+      if (uploadProgressBar) uploadProgressBar.style.width = '35%';
+
+      try {
+        const formData = new FormData();
+        formData.append('reqtype', 'fileupload');
+        formData.append('time', '72h');
+        formData.append('fileToUpload', file);
+
+        if (uploadStatusPct) uploadStatusPct.textContent = '70%';
+        if (uploadProgressBar) uploadProgressBar.style.width = '70%';
+
+        const res = await fetch('https://litterbox.catbox.moe/resources/internals/api.php', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          const directUrl = (await res.text()).trim();
+          if (directUrl && directUrl.startsWith('http')) {
+            if (uploadProgressBar) uploadProgressBar.style.width = '100%';
+            if (uploadStatusPct) uploadStatusPct.textContent = '100%';
+            return directUrl;
+          }
+        }
+      } catch (err) {}
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch('https://tmpfiles.org/api/v1/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.data?.url) {
+            if (uploadProgressBar) uploadProgressBar.style.width = '100%';
+            if (uploadStatusPct) uploadStatusPct.textContent = '100%';
+            return json.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+          }
+        }
+      } catch (err) {}
+
+      return null;
+    }
+
+    // --- LIVING PHOTO HANGOUT (REAL-TIME PHOTO CHAT) ---
+    function getPhotoHangoutTopic(photoId) {
+      return `chatteer_photo_hangout_${photoId}`;
+    }
+
+    async function connectToHangout(photoId) {
+      currentHangoutMessages = [];
+      if (hangoutMessagesList) hangoutMessagesList.innerHTML = '';
+      if (hangoutEmptyHint) hangoutEmptyHint.classList.remove('hidden');
+
+      if (hangoutEventSource) {
+        hangoutEventSource.close();
+      }
+
+      try {
+        const res = await fetch(`https://ntfy.sh/${getPhotoHangoutTopic(photoId)}/json?poll=1`);
+        if (res.ok) {
+          const text = await res.text();
+          const lines = text.trim().split('\n');
+          lines.forEach(line => {
+            if (!line) return;
+            try {
+              const entry = JSON.parse(line);
+              if (entry.event === 'message' && entry.message) {
+                const payload = JSON.parse(entry.message);
+                if (payload.type === 'hangout_msg' && !isUserBanned(payload.userName)) {
+                  currentHangoutMessages.push(payload);
+                }
+              }
+            } catch (e) {}
+          });
+          renderHangoutMessages();
+        }
+      } catch (e) {}
+
+      try {
+        hangoutEventSource = new EventSource(`https://ntfy.sh/${getPhotoHangoutTopic(photoId)}/sse`);
+        hangoutEventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.event === 'message' && data.message) {
+              const payload = JSON.parse(data.message);
+              if (payload.type === 'hangout_msg' && !isUserBanned(payload.userName)) {
+                if (!currentHangoutMessages.some(m => m.id === payload.id)) {
+                  currentHangoutMessages.push(payload);
+                  renderHangoutMessages();
+                  playAudioTone(580);
+                }
+              }
+            }
+          } catch (e) {}
+        };
+      } catch (e) {}
+    }
+
+    function renderHangoutMessages() {
+      if (!hangoutMessagesList) return;
+      hangoutMessagesList.innerHTML = '';
+
+      const validHangoutMessages = currentHangoutMessages.filter(m => !isUserBanned(m.userName));
+
+      if (validHangoutMessages.length === 0) {
+        if (hangoutEmptyHint) hangoutMessagesList.appendChild(hangoutEmptyHint);
+        return;
+      }
+
+      validHangoutMessages.forEach(msg => {
+        const row = document.createElement('div');
+        const isMe = msg.userName === myProfile.name;
+        row.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-0.5`;
+
+        const userKarma = calculateKarmaForUser(msg.userName);
+        const flair = getKarmaFlair(userKarma);
+
+        row.innerHTML = `
+          <div class="flex items-center gap-1 text-[10px] text-slate-400">
+            <span class="font-bold text-slate-700">@${escapeHtml(msg.userName)}</span>
+            <span class="px-1 py-0.2 rounded ${flair.cls} font-bold text-[9px]">${flair.icon}</span>
+            <span>${formatTime(msg.createdAt)}</span>
+          </div>
+          <div class="px-3 py-1.5 rounded-2xl ${isMe ? 'bg-indigo-600 text-white rounded-br-xs' : 'bg-slate-100 text-slate-800 rounded-bl-xs'} break-words max-w-[90%]">
+            ${escapeHtml(sanitizeContent(msg.text))}
+          </div>
+        `;
+        hangoutMessagesList.appendChild(row);
+      });
+
+      hangoutMessagesList.scrollTop = hangoutMessagesList.scrollHeight;
+    }
+
+    async function sendHangoutMessage(text) {
+      if (isUserBanned(myProfile.name)) {
+        showToast('Your account is banned for violating safety rules.', 'error');
+        return;
+      }
+      if (!currentActivePhoto || !text) return;
+      const clean = sanitizeContent(text.trim());
+      if (!clean) return;
+
+      const newMsg = {
+        id: 'hmsg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        photoId: currentActivePhoto.id,
+        userName: myProfile.name,
+        userAvatar: myProfile.avatar,
+        text: clean,
+        createdAt: Date.now(),
+        type: 'hangout_msg'
+      };
+
+      currentHangoutMessages.push(newMsg);
+      renderHangoutMessages();
+      playAudioTone(720);
+
+      if (!currentActivePhoto.hangoutReplies) currentActivePhoto.hangoutReplies = 0;
+      currentActivePhoto.hangoutReplies += 1;
+      savePhotosLocally();
+      renderPhotos();
+
+      try {
+        await fetch(`https://ntfy.sh/${getPhotoHangoutTopic(currentActivePhoto.id)}`, {
+          method: 'POST',
+          body: JSON.stringify(newMsg)
+        });
+      } catch (e) {}
+    }
+
+    // --- PHOTO SHOWCASE STATE & CALCULATIONS ---
+    function getPhotoTopic() {
+      return `chatteer_worldwide_photos_hub`;
+    }
+
+    function getRatingStats(photo) {
+      if (!photo.ratings || typeof photo.ratings !== 'object') {
+        return { avg: 0, count: 0 };
+      }
+      const vals = Object.values(photo.ratings).map(Number).filter(n => !isNaN(n) && n >= 1 && n <= 5);
+      if (vals.length === 0) return { avg: 0, count: 0 };
+      const sum = vals.reduce((a, b) => a + b, 0);
+      return {
+        avg: Number((sum / vals.length).toFixed(1)),
+        count: vals.length
+      };
+    }
+
+    function initPhotos() {
+      try {
+        const stored = localStorage.getItem('chatteer_worldwide_photos');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          allPhotos = (Array.isArray(parsed) ? parsed : []).filter(p => !isUserBanned(p.author));
+        } else {
+          allPhotos = [];
+        }
+      } catch (e) {
+        allPhotos = [];
+      }
+    }
+
+    function savePhotosLocally() {
+      try {
+        const serializable = allPhotos
+          .filter(p => !isUserBanned(p.author))
+          .map(p => ({
+            id: p.id,
+            title: p.title,
+            author: p.author,
+            avatar: p.avatar,
+            views: p.views || 0,
+            viewers: p.viewers || {},
+            likes: p.likes || 0,
+            likedBy: p.likedBy || {},
+            ratings: p.ratings || {},
+            createdAt: p.createdAt,
+            hangoutReplies: p.hangoutReplies || 0,
+            url: p.url && !p.url.startsWith('data:') ? p.url : ''
+          }));
+        localStorage.setItem('chatteer_worldwide_photos', JSON.stringify(serializable));
+      } catch (e) {}
+      updateProfileUI();
+    }
+
+    function updateModalRatingDisplay(photo) {
+      const stats = getRatingStats(photo);
+      const myRating = (photo.ratings && photo.ratings[myProfile.name]) || 0;
+      
+      const stars = document.querySelectorAll('.star-btn');
+      stars.forEach(btn => {
+        const starNum = Number(btn.getAttribute('data-star'));
+        if (myRating >= starNum) {
+          btn.className = 'star-btn text-amber-400 font-bold scale-110 transition cursor-pointer';
+        } else {
+          btn.className = 'star-btn text-slate-300 hover:text-amber-400 transition cursor-pointer';
+        }
+      });
+
+      const avgEl = document.getElementById('modal-rating-avg');
+      const statusEl = document.getElementById('modal-user-rated-status');
+
+      if (avgEl) avgEl.textContent = stats.count > 0 ? `★ ${stats.avg} (${stats.count})` : '★ Unrated';
+      if (statusEl) {
+        statusEl.textContent = myRating > 0 ? `Awarded ${myRating} ★ to @${photo.author}` : 'Tap a star to award karma';
+      }
+    }
+
+    async function openPhotoViewer(photo) {
+      if (isUserBanned(photo.author)) {
+        showToast('This post has been removed by moderation.', 'error');
+        return;
+      }
+
+      currentActivePhoto = photo;
+      if (modalPhotoTitle) modalPhotoTitle.textContent = sanitizeContent(photo.title);
+      if (modalPhotoAuthor) modalPhotoAuthor.textContent = `@${photo.author}`;
+      if (modalPhotoAvatar) modalPhotoAvatar.textContent = photo.avatar || '🚀';
+
+      const creatorKarma = calculateKarmaForUser(photo.author);
+      const flair = getKarmaFlair(creatorKarma);
+      if (modalAuthorKarmaBadge) {
+        modalAuthorKarmaBadge.textContent = `${flair.icon} Karma ${creatorKarma}`;
+        modalAuthorKarmaBadge.className = `px-1.5 py-0.2 rounded-md ${flair.cls} text-[10px] font-extrabold`;
+      }
+
+      const ageHours = (Date.now() - (photo.createdAt || Date.now())) / (1000 * 60 * 60);
+      const hoursLeft = Math.max(0, Math.round(24 - ageHours));
+      if (hangoutTimeLeft) {
+        hangoutTimeLeft.textContent = hoursLeft > 0 ? `${hoursLeft}h Hangout Active` : 'Hangout Closed';
+      }
+
+      updateModalLikeDisplay(photo);
+      updateModalRatingDisplay(photo);
+
+      const isFirstTimeView = recordUniqueView(photo.id);
+      if (isFirstTimeView) {
+        photo.views = (photo.views || 0) + 1;
+        if (!photo.viewers) photo.viewers = {};
+        photo.viewers[myProfile.name] = true;
+        renderPhotos();
+        savePhotosLocally();
+
+        try {
+          fetch(`https://ntfy.sh/${getPhotoTopic()}`, {
+            method: 'POST',
+            body: JSON.stringify({
+              type: 'photo_view_increment',
+              photoId: photo.id,
+              user: myProfile.name,
+              views: photo.views
+            })
+          });
+        } catch (e) {}
+      }
+
+      if (modalPhotoViews) modalPhotoViews.textContent = `👁️ ${photo.views || 0} views`;
+
+      let displaySrc = photo.url;
+      if (!displaySrc) {
+        const idbData = await getPhotoFromIDB(photo.id);
+        if (idbData) displaySrc = idbData;
+      }
+
+      if (activePhotoViewer) activePhotoViewer.src = displaySrc || 'https://placehold.co/600x400/222/fff?text=Photo';
+      if (modalPhotoDirectLink) modalPhotoDirectLink.href = displaySrc || '#';
+
+      connectToHangout(photo.id);
+
+      if (viewerModal) viewerModal.classList.remove('hidden');
+    }
+
+    // --- RENDER FILTERED PHOTOS GRID ---
+    function renderPhotos() {
+      if (!photoGrid || !photoCountBadge) return;
+      const query = (photoSearchInput ? photoSearchInput.value : '').toLowerCase().trim();
+      
+      let filtered = allPhotos
+        .filter(p => !isUserBanned(p.author))
+        .filter(p => {
+          if (!query) return true;
+          const matchTitle = (p.title || '').toLowerCase().includes(query);
+          const matchAuthor = (p.author || '').toLowerCase().includes(query.replace('@', ''));
+          return matchTitle || matchAuthor;
+        });
+
+      if (currentFilter === 'spotlight') {
+        filtered = [...filtered].sort((a, b) => {
+          const aStat = getRatingStats(a);
+          const bStat = getRatingStats(b);
+          return (bStat.avg * bStat.count) - (aStat.avg * aStat.count);
+        }).slice(0, 8);
+        if (galleryHeaderTitle) galleryHeaderTitle.textContent = '✨ Slow-Drop Spotlight (Curated Batch)';
+      } else if (currentFilter === 'hangouts') {
+        const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+        filtered = filtered.filter(p => (p.createdAt || 0) > oneDayAgo);
+        if (galleryHeaderTitle) galleryHeaderTitle.textContent = '🔥 24-Hour Active Hangouts';
+      } else {
+        if (galleryHeaderTitle) galleryHeaderTitle.textContent = 'Worldwide Photo Showcase';
+      }
+
+      photoCountBadge.textContent = `${filtered.length} photo${filtered.length === 1 ? '' : 's'}`;
+
+      if (filtered.length === 0) {
+        photoGrid.innerHTML = '';
+        if (photoEmptyState) photoEmptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (photoEmptyState) photoEmptyState.classList.add('hidden');
+      photoGrid.innerHTML = '';
+
+      filtered.forEach((photo, idx) => {
+        const card = document.createElement('div');
+        const isSpotlight = currentFilter === 'spotlight' || idx === 0;
+        card.className = `group bg-white rounded-2xl border ${isSpotlight ? 'border-amber-300 ring-2 ring-amber-400/30 spotlight-card' : 'border-slate-200'} overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer`;
+
+        const previewWrap = document.createElement('div');
+        previewWrap.className = 'relative bg-slate-900 aspect-square flex items-center justify-center overflow-hidden';
+
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.alt = photo.title || 'Photo';
+        img.className = 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300';
+
+        if (photo.url) {
+          img.src = photo.url;
+        } else {
+          img.src = 'https://placehold.co/400x400/1e293b/cbd5e1?text=Loading...';
+          getPhotoFromIDB(photo.id).then((dataUrl) => {
+            if (dataUrl) img.src = dataUrl;
+          });
+        }
+
+        previewWrap.appendChild(img);
+
+        if (isSpotlight) {
+          const dropBadge = document.createElement('div');
+          dropBadge.className = 'absolute top-2 left-2 px-2 py-0.5 rounded-full bg-amber-500/90 text-white font-extrabold text-[10px] tracking-wider uppercase shadow-md flex items-center gap-1';
+          dropBadge.innerHTML = '<span>✨ Drop Pick</span>';
+          previewWrap.appendChild(dropBadge);
+        }
+
+        const hangoutBadge = document.createElement('div');
+        hangoutBadge.className = 'absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-xs text-white font-semibold text-[10px] flex items-center gap-1 border border-white/20';
+        hangoutBadge.innerHTML = `<span>💬 Hangout</span> ${photo.hangoutReplies ? `<span class="bg-indigo-600 px-1 rounded-full text-[9px]">${photo.hangoutReplies}</span>` : ''}`;
+        previewWrap.appendChild(hangoutBadge);
+
+        const cardBody = document.createElement('div');
+        cardBody.className = 'p-3 flex flex-col flex-1 justify-between gap-2';
+
+        const creatorKarma = calculateKarmaForUser(photo.author);
+        const flair = getKarmaFlair(creatorKarma);
+
+        const cardHeader = document.createElement('div');
+        cardHeader.className = 'flex items-start gap-2';
+        cardHeader.innerHTML = `
+          <div class="w-7 h-7 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-xs shrink-0 mt-0.5 select-none">
+            ${escapeHtml(photo.avatar || '🚀')}
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold text-xs sm:text-sm text-slate-800 line-clamp-1 leading-tight">${escapeHtml(photo.title)}</h3>
+            <div class="flex items-center gap-1 mt-0.5">
+              <span class="text-[10px] text-slate-500 font-medium">@${escapeHtml(photo.author)}</span>
+              <span class="text-[9px] px-1 py-0.2 rounded font-extrabold ${flair.cls}">${flair.icon}</span>
+            </div>
+          </div>
+        `;
+
+        const stats = getRatingStats(photo);
+        const ratingBadge = stats.count > 0 ? `★ ${stats.avg}` : `☆ New`;
+        const isLikedByMe = userHasLikedPhoto(photo);
+
+        const cardFooter = document.createElement('div');
+        cardFooter.className = 'flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-100 pt-2';
+        cardFooter.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-indigo-600">👁️ ${photo.views || 0}</span>
+            <span class="font-semibold ${isLikedByMe ? 'text-pink-600' : 'text-slate-500'} flex items-center gap-1">
+              ${isLikedByMe ? '❤️' : '🤍'} ${photo.likes || 0}
+            </span>
+            <span class="font-bold text-amber-500 flex items-center gap-0.5">${ratingBadge}</span>
+          </div>
+          <span>${formatDate(photo.createdAt)}</span>
+        `;
+
+        cardBody.appendChild(cardHeader);
+        cardBody.appendChild(cardFooter);
+        card.appendChild(previewWrap);
+        card.appendChild(cardBody);
+
+        card.addEventListener('click', () => openPhotoViewer(photo));
+        photoGrid.appendChild(card);
+      });
+    }
+
+    // --- REAL-TIME PHOTO CLOUD SYNC ---
+    async function loadServerPhotos() {
+      try {
+        const res = await fetch(`https://ntfy.sh/${getPhotoTopic()}/json?poll=1`);
+        if (!res.ok) return;
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        let hasNew = false;
+
+        lines.forEach(line => {
+          if (!line) return;
+          try {
+            const entry = JSON.parse(line);
+            if (entry.event === 'message' && entry.message) {
+              const pData = JSON.parse(entry.message);
+              if (pData.type === 'photo_post' && pData.photo) {
+                if (!isUserBanned(pData.photo.author) && !allPhotos.some(p => p.id === pData.photo.id)) {
+                  allPhotos.unshift(pData.photo);
+                  hasNew = true;
+                }
+              } else if (pData.type === 'photo_like_toggle') {
+                const target = allPhotos.find(p => p.id === pData.photoId);
+                if (target) {
+                  if (!target.likedBy) target.likedBy = {};
+                  if (pData.liked) {
+                    target.likedBy[pData.user] = true;
+                  } else {
+                    delete target.likedBy[pData.user];
+                  }
+                  target.likes = typeof pData.likes === 'number' ? pData.likes : Object.keys(target.likedBy).length;
+                  hasNew = true;
+                }
+              } else if (pData.type === 'photo_view_increment') {
+                const target = allPhotos.find(p => p.id === pData.photoId);
+                if (target) {
+                  if (!target.viewers) target.viewers = {};
+                  if (!target.viewers[pData.user]) {
+                    target.viewers[pData.user] = true;
+                    target.views = Math.max(target.views || 0, pData.views || (target.views || 0) + 1);
+                    hasNew = true;
+                  }
+                }
+              } else if (pData.type === 'photo_rate') {
+                const target = allPhotos.find(p => p.id === pData.photoId);
+                if (target) {
+                  if (!target.ratings) target.ratings = {};
+                  target.ratings[pData.user] = pData.rating;
+                  hasNew = true;
+                }
+              }
+            }
+          } catch (e) {}
+        });
+
+        if (hasNew) {
+          allPhotos = allPhotos.filter(p => !isUserBanned(p.author));
+          renderPhotos();
+          savePhotosLocally();
+        }
+      } catch (e) {}
+    }
+
+    function connectToPhotoServer() {
+      loadServerPhotos();
+      if (photoEventSource) {
+        photoEventSource.close();
+      }
+      try {
+        photoEventSource = new EventSource(`https://ntfy.sh/${getPhotoTopic()}/sse`);
+        photoEventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.event === 'message' && data.message) {
+              const payload = JSON.parse(data.message);
+              if (payload.type === 'photo_post' && payload.photo) {
+                if (!isUserBanned(payload.photo.author) && !allPhotos.some(p => p.id === payload.photo.id)) {
+                  allPhotos.unshift(payload.photo);
+                  renderPhotos();
+                  savePhotosLocally();
+                  showToast(`📸 New photo from @${payload.photo.author}!`);
+                }
+              } else if (payload.type === 'photo_like_toggle') {
+                const target = allPhotos.find(p => p.id === payload.photoId);
+                if (target) {
+                  if (!target.likedBy) target.likedBy = {};
+                  if (payload.liked) {
+                    target.likedBy[payload.user] = true;
+                  } else {
+                    delete target.likedBy[payload.user];
+                  }
+                  target.likes = typeof payload.likes === 'number' ? payload.likes : Object.keys(target.likedBy).length;
+                  renderPhotos();
+                  savePhotosLocally();
+                  if (currentActivePhoto && currentActivePhoto.id === target.id) {
+                    updateModalLikeDisplay(target);
+                  }
+                }
+              } else if (payload.type === 'photo_rate') {
+                const target = allPhotos.find(p => p.id === payload.photoId);
+                if (target) {
+                  if (!target.ratings) target.ratings = {};
+                  target.ratings[payload.user] = payload.rating;
+                  renderPhotos();
+                  savePhotosLocally();
+                  if (currentActivePhoto && currentActivePhoto.id === target.id) {
+                    updateModalRatingDisplay(target);
+                  }
+                }
+              }
+            }
+          } catch (e) {}
+        };
+      } catch (e) {}
+    }
+
+    // --- REAL-TIME MAIN CHAT PROTOCOL ---
+    function getRoomTopic(room) {
+      return `chatteer_worldwide_room_${room}`;
+    }
+
+    function renderMessages() {
+      if (!messagesList) return;
+      messagesList.innerHTML = '';
+
+      if (loadingElem) {
+        loadingElem.classList.add('hidden');
+      }
+
+      // Filter out any banned users
+      const validMessages = allMessages.filter(m => !isUserBanned(m.userName));
+
+      if (validMessages.length === 0) {
+        if (welcomeBanner) welcomeBanner.classList.remove('hidden');
+        if (msgCounter) msgCounter.textContent = '0 messages';
+        return;
+      }
+
+      if (welcomeBanner) welcomeBanner.classList.add('hidden');
+      if (msgCounter) msgCounter.textContent = `${validMessages.length} message${validMessages.length === 1 ? '' : 's'}`;
+
+      let lastDate = '';
+
+      validMessages.forEach((msg) => {
+        const msgDate = formatDate(msg.createdAt);
+        if (msgDate && msgDate !== lastDate) {
+          lastDate = msgDate;
+          const dateDivider = document.createElement('div');
+          dateDivider.className = 'flex items-center justify-center my-3';
+          dateDivider.innerHTML = `<span class="px-2.5 py-0.5 rounded-full bg-slate-200/70 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${msgDate}</span>`;
+          messagesList.appendChild(dateDivider);
+        }
+
+        const isMe = msg.userName === myProfile.name;
+        const row = document.createElement('div');
+        row.className = `flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`;
+
+        const userKarma = calculateKarmaForUser(msg.userName);
+        const flair = getKarmaFlair(userKarma);
+
+        const avatarMarkup = `
+          <div class="w-8 h-8 rounded-xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-center text-sm shrink-0 mb-1 select-none">
+            ${escapeHtml(msg.userAvatar || '🚀')}
+          </div>
+        `;
+
+        const bubble = document.createElement('div');
+        bubble.className = `max-w-[85%] sm:max-w-[70%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+
+        const meta = `
+          <div class="flex items-center gap-1.5 px-1 mb-1 text-[11px] text-slate-400 font-medium">
+            <span class="font-bold ${isMe ? 'text-indigo-600' : 'text-slate-700'}">@${escapeHtml(msg.userName)}</span>
+            <span class="px-1 py-0.2 rounded ${flair.cls} font-bold text-[9px]">${flair.icon}</span>
+            <span>•</span>
+            <span>${formatTime(msg.createdAt)}</span>
+          </div>
+        `;
+
+        const textContent = sanitizeContent(msg.text);
+        const bubbleBody = document.createElement('div');
+        bubbleBody.className = isMe
+          ? 'px-4 py-2.5 rounded-2xl rounded-br-xs bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/15 text-xs sm:text-sm font-normal break-words leading-relaxed'
+          : 'px-4 py-2.5 rounded-2xl rounded-bl-xs bg-white text-slate-800 border border-slate-200/80 shadow-xs text-xs sm:text-sm font-normal break-words leading-relaxed';
+        
+        if (textContent) {
+          const p = document.createElement('p');
+          p.textContent = textContent;
+          bubbleBody.appendChild(p);
+        }
+
+        if (msg.mediaUrl) {
+          const mediaContainer = document.createElement('div');
+          mediaContainer.className = 'mt-2 rounded-xl overflow-hidden bg-slate-900/10 max-w-xs border border-white/20';
+          
+          const mediaImg = document.createElement('img');
+          mediaImg.src = msg.mediaUrl;
+          mediaImg.loading = 'lazy';
+          mediaImg.alt = 'Chat media';
+          mediaImg.className = 'w-full max-h-60 object-cover cursor-pointer hover:opacity-95 transition active:scale-98';
+          
+          mediaImg.addEventListener('click', () => {
+            if (activePhotoViewer && viewerModal) {
+              activePhotoViewer.src = msg.mediaUrl;
+              if (modalPhotoTitle) modalPhotoTitle.textContent = `${msg.mediaType === 'gif' ? 'GIF' : 'Photo'} shared by @${msg.userName}`;
+              if (modalPhotoAuthor) modalPhotoAuthor.textContent = `@${msg.userName}`;
+              if (modalPhotoAvatar) modalPhotoAvatar.textContent = msg.userAvatar || '🚀';
+              if (modalPhotoViews) modalPhotoViews.textContent = '💬 Main Chat Media';
+              if (modalPhotoDirectLink) modalPhotoDirectLink.href = msg.mediaUrl;
+              viewerModal.classList.remove('hidden');
+            }
+          });
+
+          mediaContainer.appendChild(mediaImg);
+          bubbleBody.appendChild(mediaContainer);
+        }
+
+        bubble.innerHTML = meta;
+        bubble.appendChild(bubbleBody);
+
+        if (isMe) {
+          row.appendChild(bubble);
+          row.insertAdjacentHTML('beforeend', avatarMarkup);
+        } else {
+          row.insertAdjacentHTML('afterbegin', avatarMarkup);
+          row.appendChild(bubble);
+        }
+
+        messagesList.appendChild(row);
+      });
+
+      if (isAutoScrollActive) {
+        scrollToBottom(false);
+      }
+    }
+
+    async function connectToServer(room) {
+      currentRoom = room;
+      if (statusText) statusText.textContent = 'Connecting...';
+      if (connectionDot) connectionDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping';
+      if (loadingElem) loadingElem.classList.remove('hidden');
+
+      if (activeEventSource) {
+        activeEventSource.close();
+      }
+
+      try {
+        const response = await fetch(`https://ntfy.sh/${getRoomTopic(room)}/json?poll=1`);
+        if (response.ok) {
+          const text = await response.text();
+          const lines = text.trim().split('\n');
+          const loaded = [];
+
+          lines.forEach((line) => {
+            if (!line) return;
+            try {
+              const entry = JSON.parse(line);
+              if (entry.event === 'message' && entry.message) {
+                const payload = JSON.parse(entry.message);
+                if (payload.type === 'chat_msg' && !isUserBanned(payload.userName) && (payload.text || payload.mediaUrl)) {
+                  loaded.push(payload);
+                }
+              }
+            } catch (err) {}
+          });
+
+          if (loaded.length > 0) {
+            allMessages = loaded.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+          } else {
+            allMessages = [];
+          }
+        }
+      } catch (err) {
+      } finally {
+        if (loadingElem) loadingElem.classList.add('hidden');
+        if (statusText) statusText.textContent = 'Live Cloud';
+        if (connectionDot) connectionDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse';
+        if (peersCount) peersCount.textContent = 'Online';
+        renderMessages();
+        updateProfileUI();
+      }
+
+      try {
+        activeEventSource = new EventSource(`https://ntfy.sh/${getRoomTopic(room)}/sse`);
+
+        activeEventSource.onopen = () => {
+          if (statusText) statusText.textContent = 'Live Cloud';
+          if (connectionDot) connectionDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse';
+          if (peersCount) peersCount.textContent = 'Online';
+        };
+
+        activeEventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.event === 'message' && data.message) {
+              const payload = JSON.parse(data.message);
+              if (payload.type === 'chat_msg' && !isUserBanned(payload.userName) && (payload.text || payload.mediaUrl)) {
+                if (!allMessages.some((m) => m.id === payload.id)) {
+                  allMessages.push(payload);
+                  renderMessages();
+                  updateProfileUI();
+                  if (payload.userName !== myProfile.name) {
+                    playAudioTone(520);
+                  }
+                }
+              }
+            }
+          } catch (e) {}
+        };
+      } catch (err) {}
+    }
+
+    async function sendChatMessage(rawText) {
+      if (isUserBanned(myProfile.name)) {
+        showToast('Your account is banned for violating safety rules.', 'error');
+        return;
+      }
+
+      const text = rawText ? rawText.trim() : '';
+      if (!text && !activeChatAttachment) return;
+
+      const cleanText = text ? sanitizeContent(text) : '';
+      const newMsg = {
+        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+        roomId: currentRoom,
+        userName: myProfile.name,
+        userAvatar: myProfile.avatar,
+        text: cleanText,
+        mediaUrl: activeChatAttachment ? activeChatAttachment.url : null,
+        mediaType: activeChatAttachment ? activeChatAttachment.type : null,
+        createdAt: Date.now(),
+        type: 'chat_msg'
+      };
+
+      clearChatAttachment();
+      allMessages.push(newMsg);
+      renderMessages();
+      updateProfileUI();
+      playAudioTone(640);
+      scrollToBottom();
+
+      try {
+        await fetch(`https://ntfy.sh/${getRoomTopic(currentRoom)}`, {
+          method: 'POST',
+          body: JSON.stringify(newMsg)
+        });
+      } catch (err) {}
+    }
+
+    function setChatAttachment(url, type = 'photo', name = 'media') {
+      activeChatAttachment = { url, type, name };
+      if (chatAttachmentBar && chatAttachmentThumb && chatAttachmentType && chatAttachmentName) {
+        chatAttachmentThumb.src = url;
+        chatAttachmentType.textContent = type === 'gif' ? 'GIF Attached' : 'Photo Attached';
+        chatAttachmentName.textContent = name;
+        chatAttachmentBar.classList.remove('hidden');
+      }
+      if (sendButton) sendButton.disabled = false;
+    }
+
+    function clearChatAttachment() {
+      activeChatAttachment = null;
+      if (chatAttachmentBar) chatAttachmentBar.classList.add('hidden');
+      if (chatImageInput) chatImageInput.value = '';
+      if (sendButton && messageInput) {
+        sendButton.disabled = messageInput.value.trim().length === 0;
+      }
+    }
+
+    function renderGifs(category = 'trending') {
+      if (!gifGrid) return;
+      gifGrid.innerHTML = '';
+      const list = POPULAR_GIFS[category] || POPULAR_GIFS.trending;
+
+      list.forEach((gif) => {
+        const item = document.createElement('div');
+        item.className = 'group relative aspect-video bg-slate-800 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-indigo-500 transition shadow-xs';
+        item.innerHTML = `
+          <img src="${gif.url}" alt="${gif.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded-md bg-black/60 text-white text-[9px] font-semibold">${gif.title}</span>
+        `;
+        item.addEventListener('click', () => {
+          setChatAttachment(gif.url, 'gif', gif.title);
+          if (gifModal) gifModal.classList.add('hidden');
+          showToast(`🎬 Added ${gif.title} GIF`);
+          if (messageInput) messageInput.focus();
+        });
+        gifGrid.appendChild(item);
+      });
+    }
+
+    function updateProfileUI() {
+      if (userNameBadge) userNameBadge.textContent = `@${myProfile.name}`;
+      if (userAvatarBadge) userAvatarBadge.textContent = myProfile.avatar;
+      if (uploadAuthorBadge) uploadAuthorBadge.textContent = `@${myProfile.name}`;
+
+      const totalKarma = calculateKarmaForUser(myProfile.name);
+      myProfile.karma = totalKarma;
+      const flair = getKarmaFlair(totalKarma);
+
+      if (userKarmaBadge) {
+        userKarmaBadge.textContent = `${flair.icon} ${totalKarma} Karma`;
+        userKarmaBadge.title = `Your Reputation Rank: ${flair.label}`;
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatTime(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatDate(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      const today = new Date();
+      if (date.toDateString() === today.toDateString()) {
+        return 'Today';
+      }
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `px-4 py-2 rounded-xl text-xs font-bold shadow-lg transition-all transform translate-y-2 opacity-0 pointer-events-auto flex items-center gap-2 ${
+        type === 'error' ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white'
+      }`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function playAudioTone(freq = 440) {
+      if (!soundEnabled) return;
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch (e) {}
+    }
+
+    function scrollToBottom(smooth = true) {
+      if (!chatContainer) return;
+      chatContainer.scrollTo({
+        top: chatContainer.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+      if (scrollBottomBtn) {
+        scrollBottomBtn.classList.add('translate-y-10', 'opacity-0');
+      }
+    }
+
+    // --- FILTER TABS EVENT LISTENERS ---
+    if (filterAllBtn && filterSpotlightBtn && filterHangoutsBtn) {
+      const resetFilterButtons = () => {
+        [filterAllBtn, filterSpotlightBtn, filterHangoutsBtn].forEach(b => {
+          b.className = 'photo-filter-tab px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer flex items-center gap-1';
+        });
+      };
+
+      filterAllBtn.addEventListener('click', () => {
+        resetFilterButtons();
+        filterAllBtn.className = 'photo-filter-tab active px-3 py-1 rounded-xl bg-indigo-600 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1';
+        currentFilter = 'all';
+        renderPhotos();
+      });
+
+      filterSpotlightBtn.addEventListener('click', () => {
+        resetFilterButtons();
+        filterSpotlightBtn.className = 'photo-filter-tab active px-3 py-1 rounded-xl bg-amber-600 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1';
+        currentFilter = 'spotlight';
+        renderPhotos();
+      });
+
+      filterHangoutsBtn.addEventListener('click', () => {
+        resetFilterButtons();
+        filterHangoutsBtn.className = 'photo-filter-tab active px-3 py-1 rounded-xl bg-violet-600 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1';
+        currentFilter = 'hangouts';
+        renderPhotos();
+      });
+    }
+
+    // --- HANGOUT CHAT FORM SUBMISSION ---
+    if (hangoutChatForm && hangoutMsgInput) {
+      hangoutChatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = hangoutMsgInput.value.trim();
+        if (!text) return;
+        sendHangoutMessage(text);
+        hangoutMsgInput.value = '';
+      });
+    }
+
+    // --- ATTACHMENT AND MODAL LISTENERS ---
+    if (tabModeFile && tabModeUrl && fileUploadSection && urlUploadSection) {
+      tabModeFile.addEventListener('click', () => {
+        currentUploadMode = 'file';
+        tabModeFile.className = 'flex-1 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 transition cursor-pointer';
+        tabModeUrl.className = 'flex-1 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
+        fileUploadSection.classList.remove('hidden');
+        urlUploadSection.classList.add('hidden');
+      });
+
+      tabModeUrl.addEventListener('click', () => {
+        currentUploadMode = 'url';
+        tabModeUrl.className = 'flex-1 py-1.5 rounded-lg bg-white shadow-xs text-indigo-700 transition cursor-pointer';
+        tabModeFile.className = 'flex-1 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
+        urlUploadSection.classList.remove('hidden');
+        fileUploadSection.classList.add('hidden');
+      });
+    }
+
+    if (profileToggleBtn) {
+      profileToggleBtn.addEventListener('click', () => {
+        const flair = getKarmaFlair(myProfile.karma);
+        showToast(`🔒 @${myProfile.name} • ${myProfile.karma} Karma (${flair.label})`);
+      });
+    }
+
+    if (pageNavBtn && viewChat && viewPhotos && pageNavIcon && pageNavLabel) {
+      pageNavBtn.addEventListener('click', () => {
+        if (currentTab === 'chat') {
+          currentTab = 'photos';
+          viewChat.classList.add('hidden');
+          viewPhotos.classList.remove('hidden');
+          pageNavIcon.textContent = '💬';
+          pageNavLabel.textContent = 'To Chat';
+          connectToPhotoServer();
+          renderPhotos();
+        } else {
+          currentTab = 'chat';
+          viewPhotos.classList.add('hidden');
+          viewChat.classList.remove('hidden');
+          pageNavIcon.textContent = '📸';
+          pageNavLabel.textContent = 'To Photos';
+          scrollToBottom(false);
+        }
+      });
+    }
+
+    document.querySelectorAll('.room-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.room-btn').forEach((b) => {
+          b.className = 'room-btn px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition cursor-pointer';
+        });
+        btn.className = 'room-btn active px-3 py-1 rounded-lg bg-indigo-100/70 text-indigo-700 border border-indigo-300 font-semibold transition cursor-pointer';
+        const room = btn.getAttribute('data-room') || 'global';
+        connectToServer(room);
+      });
+    });
+
+    if (chatForm && messageInput && sendButton) {
+      messageInput.addEventListener('input', () => {
+        const val = messageInput.value.trim();
+        sendButton.disabled = val.length === 0 && !activeChatAttachment;
+        const charLimit = document.getElementById('char-limit');
+        if (charLimit) charLimit.textContent = 400 - messageInput.value.length;
+      });
+
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = messageInput.value.trim();
+        if (!text && !activeChatAttachment) return;
+        sendChatMessage(text);
+        messageInput.value = '';
+        const charLimit = document.getElementById('char-limit');
+        if (charLimit) charLimit.textContent = '400';
+      });
+    }
+
+    if (chatRemoveAttachment) {
+      chatRemoveAttachment.addEventListener('click', clearChatAttachment);
+    }
+
+    if (chatImageInput) {
+      chatImageInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        showToast('Compressing image for chat...', 'info');
+        try {
+          const compressed = await compressImageFile(file, 900, 0.8);
+          setChatAttachment(compressed, 'photo', file.name);
+          showToast('📸 Photo ready to send!');
+
+          uploadImageToCDN(file).then((cdnUrl) => {
+            if (cdnUrl && activeChatAttachment && activeChatAttachment.url === compressed) {
+              activeChatAttachment.url = cdnUrl;
+            }
+          }).catch(() => {});
+        } catch (err) {
+          showToast('Could not load image file.', 'error');
+        }
+      });
+    }
+
+    if (chatGifBtn && gifModal) {
+      chatGifBtn.addEventListener('click', () => {
+        gifModal.classList.remove('hidden');
+        renderGifs('trending');
+      });
+    }
+
+    if (closeGifModal && gifModal) {
+      closeGifModal.addEventListener('click', () => gifModal.classList.add('hidden'));
+    }
+
+    if (gifModal) {
+      gifModal.addEventListener('click', (e) => {
+        if (e.target === gifModal) gifModal.classList.add('hidden');
+      });
+    }
+
+    document.querySelectorAll('.gif-cat-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.gif-cat-btn').forEach(b => {
+          b.className = 'gif-cat-btn px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition shrink-0 cursor-pointer';
+        });
+        btn.className = 'gif-cat-btn active px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold transition shrink-0 cursor-pointer';
+        const cat = btn.getAttribute('data-gif-cat') || 'trending';
+        renderGifs(cat);
+      });
+    });
+
+    if (applyCustomGifBtn && customGifUrlInput) {
+      applyCustomGifBtn.addEventListener('click', () => {
+        const url = customGifUrlInput.value.trim();
+        if (!url || !url.startsWith('http')) {
+          showToast('Please enter a valid image or GIF URL.', 'error');
+          return;
+        }
+        setChatAttachment(url, url.toLowerCase().includes('.gif') ? 'gif' : 'photo', 'Web Media');
+        customGifUrlInput.value = '';
+        if (gifModal) gifModal.classList.add('hidden');
+        showToast('🔗 Media attached!');
+        if (messageInput) messageInput.focus();
+      });
+    }
+
+    document.querySelectorAll('.quick-emoji').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (messageInput) {
+          messageInput.value += btn.textContent;
+          messageInput.focus();
+          if (sendButton) sendButton.disabled = false;
+        }
+      });
+    });
+
+    if (chatContainer) {
+      chatContainer.addEventListener('scroll', () => {
+        const distFromBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight;
+        isAutoScrollActive = distFromBottom < 100;
+        if (scrollBottomBtn) {
+          if (distFromBottom > 150) {
+            scrollBottomBtn.classList.remove('translate-y-10', 'opacity-0');
+          } else {
+            scrollBottomBtn.classList.add('translate-y-10', 'opacity-0');
+          }
+        }
+      });
+    }
+
+    if (scrollBottomBtn) {
+      scrollBottomBtn.addEventListener('click', () => {
+        isAutoScrollActive = true;
+        scrollToBottom(true);
+      });
+    }
+
+    if (soundBtn && soundIconOn && soundIconOff) {
+      soundBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        if (soundEnabled) {
+          soundIconOn.classList.remove('hidden');
+          soundIconOff.classList.add('hidden');
+          showToast('🔔 Sound cues enabled');
+        } else {
+          soundIconOn.classList.add('hidden');
+          soundIconOff.classList.remove('hidden');
+          showToast('🔕 Sound cues muted');
+        }
+      });
+    }
+
+    if (photoSearchInput) {
+      photoSearchInput.addEventListener('input', renderPhotos);
+    }
+
+    if (openUploadBtn && uploadModal) {
+      openUploadBtn.addEventListener('click', () => {
+        if (isUserBanned(myProfile.name)) {
+          showToast('Your account is banned.', 'error');
+          return;
+        }
+        uploadModal.classList.remove('hidden');
+        if (photoTitleInput) photoTitleInput.value = '';
+        if (photoFileInput) photoFileInput.value = '';
+        if (photoUrlInput) photoUrlInput.value = '';
+        selectedImageBase64 = null;
+        if (photoFilePreviewWrap) photoFilePreviewWrap.classList.add('hidden');
+        if (uploadProgressBox) uploadProgressBox.classList.add('hidden');
+        if (submitBtnSpinner) submitBtnSpinner.classList.add('hidden');
+        if (submitBtnText) submitBtnText.textContent = 'Publish Worldwide';
+        if (fileNameLabel) fileNameLabel.textContent = 'Tap to take photo or choose from library';
+        if (fileSizeLabel) fileSizeLabel.textContent = 'JPG, PNG, WebP, GIF supported';
+      });
+    }
+
+    if (closeUploadModal && uploadModal) {
+      closeUploadModal.addEventListener('click', () => uploadModal.classList.add('hidden'));
+    }
+    if (cancelUploadBtn && uploadModal) {
+      cancelUploadBtn.addEventListener('click', () => uploadModal.classList.add('hidden'));
+    }
+
+    if (photoFileInput) {
+      photoFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (fileNameLabel) fileNameLabel.textContent = file.name;
+        if (fileSizeLabel) fileSizeLabel.textContent = `Compressing ${(file.size / (1024 * 1024)).toFixed(2)} MB...`;
+
+        try {
+          const compressed = await compressImageFile(file, 1200, 0.82);
+          selectedImageBase64 = compressed;
+          if (photoFilePreviewImg && photoFilePreviewWrap) {
+            photoFilePreviewImg.src = compressed;
+            photoFilePreviewWrap.classList.remove('hidden');
+          }
+          if (fileSizeLabel) fileSizeLabel.textContent = '✅ Image ready for high-speed sharing';
+        } catch (err) {
+          showToast('Failed to process image file.', 'error');
+        }
+      });
+    }
+
+    if (uploadForm) {
+      uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (isUserBanned(myProfile.name)) {
+          showToast('Your account is banned.', 'error');
+          return;
+        }
+
+        const title = photoTitleInput ? photoTitleInput.value.trim() : '';
+        if (!title) {
+          showToast('Please enter a title for your photo.', 'error');
+          return;
+        }
+
+        let finalImageUrl = '';
+
+        if (currentUploadMode === 'file') {
+          if (!selectedImageBase64) {
+            showToast('Please select a photo to share.', 'error');
+            return;
+          }
+
+          if (submitBtnSpinner) submitBtnSpinner.classList.remove('hidden');
+          if (submitBtnText) submitBtnText.textContent = 'Uploading...';
+          const submitBtn = document.getElementById('submit-photo-btn');
+          if (submitBtn) submitBtn.disabled = true;
+
+          const file = photoFileInput.files[0];
+          if (file) {
+            const uploadedUrl = await uploadImageToCDN(file);
+            if (uploadedUrl) {
+              finalImageUrl = uploadedUrl;
+            }
+          }
+        } else {
+          const link = photoUrlInput ? photoUrlInput.value.trim() : '';
+          if (!link || !link.startsWith('http')) {
+            showToast('Please enter a valid web image link.', 'error');
+            return;
+          }
+          finalImageUrl = link;
+        }
+
+        const cleanTitle = sanitizeContent(title);
+
+        const newPhoto = {
+          id: 'photo_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+          title: cleanTitle,
+          author: myProfile.name,
+          avatar: myProfile.avatar,
+          views: 0,
+          viewers: {},
+          likes: 0,
+          likedBy: {},
+          ratings: {},
+          hangoutReplies: 0,
+          createdAt: Date.now(),
+          url: finalImageUrl
+        };
+
+        if (selectedImageBase64) {
+          await savePhotoToIDB(newPhoto.id, selectedImageBase64);
+          if (!newPhoto.url) {
+            newPhoto.url = selectedImageBase64;
+          }
+        }
+
+        allPhotos.unshift(newPhoto);
+        savePhotosLocally();
+        renderPhotos();
+
+        if (submitBtnSpinner) submitBtnSpinner.classList.add('hidden');
+        if (submitBtnText) submitBtnText.textContent = 'Publish Worldwide';
+        const submitBtn = document.getElementById('submit-photo-btn');
+        if (submitBtn) submitBtn.disabled = false;
+        if (uploadModal) uploadModal.classList.add('hidden');
+        showToast('🎉 Photo posted! 24h Live Hangout is active.');
+
+        try {
+          await fetch(`https://ntfy.sh/${getPhotoTopic()}`, {
+            method: 'POST',
+            body: JSON.stringify({
+              type: 'photo_post',
+              photo: newPhoto
+            })
+          });
+        } catch (err) {}
+      });
+    }
+
+    if (closeViewerBtn && viewerModal) {
+      closeViewerBtn.addEventListener('click', () => {
+        viewerModal.classList.add('hidden');
+        if (hangoutEventSource) {
+          hangoutEventSource.close();
+        }
+      });
+    }
+
+    if (viewerModal) {
+      viewerModal.addEventListener('click', (e) => {
+        if (e.target === viewerModal) {
+          viewerModal.classList.add('hidden');
+          if (hangoutEventSource) {
+            hangoutEventSource.close();
+          }
+        }
+      });
+    }
+
+    document.querySelectorAll('.star-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (!currentActivePhoto) return;
+        const score = Number(btn.getAttribute('data-star'));
+        if (!score || score < 1 || score > 5) return;
+
+        if (!currentActivePhoto.ratings) currentActivePhoto.ratings = {};
+        currentActivePhoto.ratings[myProfile.name] = score;
+
+        updateModalRatingDisplay(currentActivePhoto);
+        renderPhotos();
+        savePhotosLocally();
+        playAudioTone(880);
+        showToast(`⭐ Awarded ${score} / 5 stars (+${score * 4} Karma)!`);
+
+        try {
+          fetch(`https://ntfy.sh/${getPhotoTopic()}`, {
+            method: 'POST',
+            body: JSON.stringify({
+              type: 'photo_rate',
+              photoId: currentActivePhoto.id,
+              user: myProfile.name,
+              rating: score
+            })
+          });
+        } catch (e) {}
+      });
+    });
+
+    if (modalLikeBtn) {
+      modalLikeBtn.addEventListener('click', () => {
+        if (!currentActivePhoto) return;
+        if (!currentActivePhoto.likedBy) currentActivePhoto.likedBy = {};
+
+        const alreadyLiked = !!currentActivePhoto.likedBy[myProfile.name];
+
+        if (alreadyLiked) {
+          delete currentActivePhoto.likedBy[myProfile.name];
+          currentActivePhoto.likes = Math.max(0, (currentActivePhoto.likes || 1) - 1);
+          showToast('🤍 Removed like');
+        } else {
+          currentActivePhoto.likedBy[myProfile.name] = true;
+          currentActivePhoto.likes = (currentActivePhoto.likes || 0) + 1;
+          playAudioTone(780);
+          showToast('❤ You liked this photo (+10 Karma to creator)!');
+        }
+
+        updateModalLikeDisplay(currentActivePhoto);
+        renderPhotos();
+        savePhotosLocally();
+
+        try {
+          fetch(`https://ntfy.sh/${getPhotoTopic()}`, {
+            method: 'POST',
+            body: JSON.stringify({
+              type: 'photo_like_toggle',
+              photoId: currentActivePhoto.id,
+              user: myProfile.name,
+              liked: !alreadyLiked,
+              likes: currentActivePhoto.likes
+            })
+          });
+        } catch (e) {}
+      });
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && currentTab === 'chat') {
+        connectToServer(currentRoom);
+      }
+    });
+
+    // --- INITIALIZE APPLICATION ---
+    initPermanentIdentity();
+    initPhotos();
+    connectToServer(currentRoom);
+    startSlowDropTimer();
+  </script>
+</body>
+</html>
