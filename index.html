@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>chatteer - Worldwide Chat & Photo Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z' fill='%23F7DC4E'/><line x1='34' y1='28' x2='33' y2='52' stroke='%23262D36' stroke-width='7' stroke-linecap='round'/><line x1='55' y1='39' x2='80' y2='42' stroke='%23262D36' stroke-width='7' stroke-linecap='round'/><path d='M 29 60 Q 48 76 68 59' stroke='%23262D36' stroke-width='7' stroke-linecap='round' fill='none'/></svg>">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      touch-action: manipulation;
+    }
+    .brand-font {
+      font-family: 'Outfit', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(241, 245, 249, 0.8);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(165, 180, 252, 0.6);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(129, 140, 248, 0.8);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); }
+      50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.55); }
+    }
+    .spotlight-card {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .mobile-safe-bottom {
+        padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+      }
+      .mobile-safe-bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+    }
+    .kb-key {
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col h-screen overflow-hidden select-none">
+
+  <!-- PERMANENT AUTO-BAN OVERLAY -->
+  <div id="ban-lock-overlay" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center border-2 border-red-500 shadow-2xl space-y-4">
+      <div class="w-16 h-16 rounded-full bg-red-100 border-2 border-red-300 flex items-center justify-center text-3xl mx-auto shadow-inner">
+        🚫
+      </div>
+      <div>
+        <h2 class="text-xl font-black brand-font text-slate-900">Device Permanently Banned</h2>
+        <p class="text-xs text-red-600 font-bold uppercase tracking-wider mt-1">Chatteer AutoMod AI Enforcement</p>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-2xl border border-slate-200">
+        Your device attempted to publish prohibited content or bypassed filters using intentional typos or leetspeak. AutoMod AI has permanently revoked your chat privileges.
+      </p>
+      <div class="text-[11px] text-slate-400 font-mono">
+        Permanent Ban ID: <span id="ban-lock-id" class="text-red-500 font-bold">LOCKED</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP HEADER -->
+  <header class="bg-white/95 border-b border-slate-200/90 backdrop-blur-md px-3 sm:px-5 py-2 shrink-0 flex items-center justify-between z-20 shadow-sm">
+    <div class="flex items-center space-x-2 sm:space-x-3">
+      <!-- Mascot SVG -->
+      <div class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 drop-shadow hover:scale-105 transition-transform cursor-pointer" title="chatteer mascot">
+        <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z" fill="#F7DC4E"/>
+          <line x1="34" y1="28" x2="33" y2="52" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+          <line x1="55" y1="39" x2="80" y2="42" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M 29 60 Q 48 76 68 59" stroke="#262D36" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <h1 class="brand-font text-lg sm:text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+            chatteer
+          </h1>
+          <span class="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full flex items-center gap-1">
+            <span id="connection-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="connection-status">Live</span>
+          </span>
+          <span id="mod-active-badge" class="hidden px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-700 border border-red-300 rounded-full flex items-center gap-1 shadow-xs">
+            🛡️️ Mod
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="flex items-center gap-1.5 sm:gap-3">
+      <button id="page-nav-btn" type="button" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer">
+        <span id="page-nav-icon">📸</span>
+        <span id="page-nav-label">Photos</span>
+      </button>
+
+      <!-- Identity Lock Badge -->
+      <div id="profile-toggle-btn" title="Device username is locked" class="flex items-center gap-1.5 px-2 py-1 rounded-2xl bg-gradient-to-r from-slate-100 to-amber-50/70 border border-slate-200/90 shadow-xs text-left select-none cursor-pointer">
+        <span id="user-avatar-badge" class="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-xs">🐺</span>
+        <div class="flex flex-col pr-0.5">
+          <div class="flex items-center gap-1">
+            <span id="user-karma-badge" class="text-[8px] sm:text-[9px] font-extrabold uppercase text-amber-600 bg-amber-100/70 px-1 rounded">0 Karma</span>
+            <span class="text-[8px] text-slate-400">🔒</span>
+          </div>
+          <span id="user-name-badge" class="text-[11px] font-bold text-slate-800 max-w-[80px] sm:max-w-[120px] truncate leading-none mt-0.5">@Wolf</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CHAT VIEW CONTAINER -->
+  <div id="view-chat" class="flex flex-col flex-1 overflow-hidden pb-14 sm:pb-0">
+    <div class="bg-white/80 border-b border-slate-200 px-3 py-1.5 flex items-center justify-between text-xs text-slate-500">
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <button type="button" data-room="global" class="room-btn active px-2.5 py-0.5 rounded-lg bg-indigo-100/70 text-indigo-700 border border-indigo-300 font-semibold text-xs cursor-pointer">
+          # global
+        </button>
+        <button type="button" data-room="chill" class="room-btn px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 text-xs cursor-pointer">
+          # chill
+        </button>
+        <button type="button" data-room="tech" class="room-btn px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 text-xs cursor-pointer">
+          # gaming
+        </button>
+      </div>
+      <span id="msg-counter" class="text-[11px] text-slate-400 font-medium">0 msgs</span>
+    </div>
+
+    <!-- Messages Container -->
+    <main class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 relative select-text bg-slate-50/60" id="chat-messages-container">
+      <div id="messages-loading" class="flex flex-col items-center justify-center py-16 text-slate-400 space-y-2">
+        <div class="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-xs font-medium">Connecting to chat...</p>
+      </div>
+      
+      <div id="welcome-banner" class="hidden text-center max-w-sm mx-auto py-6 px-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <div class="w-12 h-12 mx-auto mb-2">
+          <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z" fill="#F7DC4E"/>
+            <line x1="34" y1="28" x2="33" y2="52" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+            <line x1="55" y1="39" x2="80" y2="42" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+            <path d="M 29 60 Q 48 76 68 59" stroke="#262D36" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-slate-800 text-sm">Welcome to chatteer live</h3>
+        <p class="text-[11px] text-slate-500 mt-0.5">Safe worldwide chat with on-screen keyboard.</p>
+      </div>
+
+      <div id="messages-list" class="space-y-3 max-w-3xl mx-auto pb-2"></div>
+    </main>
+
+    <!-- Chat Input Footer -->
+    <footer id="chat-footer-bar" class="bg-white/95 border-t border-slate-200 p-2 sm:p-3 shrink-0 backdrop-blur-md z-20 shadow-sm transition-all duration-200">
+      <div class="max-w-3xl mx-auto">
+        <!-- Quick Emojis -->
+        <div class="flex items-center gap-1 pb-1.5 overflow-x-auto no-scrollbar text-base">
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">👋</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">✨</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">🔥</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">🎉</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">❤️</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">😂</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">💯</button>
+        </div>
+
+        <form id="chat-form" class="flex items-center gap-1.5">
+          <!-- Custom Keyboard Toggle -->
+          <button id="custom-keyboard-toggle" type="button" title="Toggle On-Screen Keyboard" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer shrink-0 text-sm">
+            ⌨️
+          </button>
+
+          <div class="relative flex-1">
+            <input
+              id="message-input"
+              type="text"
+              inputmode="none"
+              maxlength="400"
+              placeholder="Tap to type with on-screen keyboard..."
+              autocomplete="off"
+              class="w-full bg-slate-50 text-slate-900 placeholder-slate-400 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 border border-slate-200 shadow-inner"
+            />
+          </div>
+
+          <button
+            type="submit"
+            id="send-button"
+            disabled
+            class="bg-indigo-600 disabled:opacity-40 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center justify-center shrink-0 cursor-pointer"
+          >
+            <span>Send</span>
+          </button>
+        </form>
+      </div>
+    </footer>
+  </div>
+
+  <!-- PHOTOS VIEW CONTAINER -->
+  <div id="view-photos" class="hidden flex flex-col flex-1 overflow-hidden bg-slate-50 pb-14 sm:pb-0">
+    <div class="bg-white border-b border-slate-200 px-3 py-2 shrink-0">
+      <div class="max-w-4xl mx-auto flex items-center justify-between gap-2">
+        <input
+          id="photo-search-input"
+          type="text"
+          inputmode="none"
+          placeholder="Search photos..."
+          class="flex-1 bg-slate-100 text-slate-800 px-3 py-1.5 rounded-xl text-xs border border-slate-200 focus:outline-none"
+        />
+        <button id="open-upload-btn" type="button" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-indigo-600 text-white font-bold text-xs cursor-pointer">
+          + Post
+        </button>
+      </div>
+      <div class="max-w-4xl mx-auto mt-2 flex items-center justify-between gap-2 text-xs">
+        <span id="photo-count-badge" class="text-[11px] text-slate-400">0 photos</span>
+      </div>
+    </div>
+
+    <!-- Photo Gallery Grid -->
+    <div class="flex-1 overflow-y-auto p-3" id="photo-feed-container">
+      <div class="max-w-4xl mx-auto">
+        <div id="photo-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+        <div id="photo-empty-state" class="hidden text-center py-12 text-slate-400">
+          <p class="text-xs">No photos yet! Be the first to share one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPACT MOBILE ON-SCREEN KEYBOARD DRAWER -->
+  <div id="custom-keyboard-drawer" class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/98 backdrop-blur-xl border-t border-slate-700 p-1 sm:p-2 shadow-2xl transition-transform duration-200 transform translate-y-full select-none mobile-safe-bottom">
+    <div class="w-full max-w-md mx-auto flex flex-col gap-1">
+      <div class="flex items-center justify-between px-1.5 py-0.5 text-slate-300 text-[10px]">
+        <span class="font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1">
+          <span>⌨️</span> chatteer keys
+        </span>
+        <button id="close-custom-keyboard" type="button" class="px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] cursor-pointer active:scale-95">
+          Done ✓
+        </button>
+      </div>
+
+      <!-- Numbers Row (1 to 0) -->
+      <div class="grid grid-cols-10 gap-0.5 sm:gap-1">
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">1</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">2</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">3</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">4</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">5</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">6</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">7</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">8</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">9</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">0</button>
+      </div>
+
+      <!-- Letters Row 1 (Q to P) -->
+      <div class="grid grid-cols-10 gap-0.5 sm:gap-1">
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">q</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">w</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">e</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">r</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">t</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">y</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">u</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">i</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">o</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">p</button>
+      </div>
+
+      <!-- Letters Row 2 (A to L) -->
+      <div class="grid grid-cols-9 gap-0.5 sm:gap-1 px-2 sm:px-3">
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">a</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">s</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">d</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">f</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">g</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">h</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">j</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">k</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">l</button>
+      </div>
+
+      <!-- Letters Row 3: Shift + Z-M + Backspace -->
+      <div class="flex items-center gap-0.5 sm:gap-1">
+        <button id="kb-shift-btn" type="button" class="kb-key flex-[1.3] min-w-0 h-8 sm:h-9 bg-slate-700 hover:bg-slate-600 active:bg-indigo-600 text-white font-black rounded-lg shadow-xs text-xs flex items-center justify-center cursor-pointer">
+          ⇧
+        </button>
+        <div class="grid grid-cols-7 gap-0.5 sm:gap-1 flex-[7] min-w-0">
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">z</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">x</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">c</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">v</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">b</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">n</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">m</button>
+        </div>
+        <button id="kb-backspace-btn" type="button" class="kb-key flex-[1.3] min-w-0 h-8 sm:h-9 bg-slate-700 hover:bg-slate-600 active:bg-rose-600 text-white font-black rounded-lg shadow-xs text-xs flex items-center justify-center cursor-pointer">
+          ⌫
+        </button>
+      </div>
+
+      <!-- Bottom Space & Send Row -->
+      <div class="flex items-center gap-1 sm:gap-1.5 pt-0.5">
+        <button id="kb-space-btn" type="button" class="kb-key flex-1 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 font-bold rounded-lg shadow-xs text-xs tracking-wider uppercase flex items-center justify-center cursor-pointer">
+          Space
+        </button>
+        <button id="kb-send-btn" type="button" class="kb-key px-4 sm:px-6 h-8 sm:h-9 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold rounded-lg shadow-xs text-xs flex items-center justify-center cursor-pointer">
+          ↵ Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed top-14 right-3 z-50 flex flex-col gap-1.5 pointer-events-none"></div>
+
+  <!-- APPLICATION SCRIPT -->
+  <script type="module">
+    // --- SUPER MODERATOR CREDENTIALS ---
+    const MODERATOR_ACCOUNTS = new Set(['pixelwolf_8390']);
+
+    // --- BANS & STORAGE ---
+    let dynamicBannedUsers = new Set(['turboviper_1118']);
+
+    function loadBannedUsers() {
+      try {
+        const stored = JSON.parse(localStorage.getItem('chatteer_banned_users') || '[]');
+        if (Array.isArray(stored)) {
+          stored.forEach(u => dynamicBannedUsers.add(String(u).toLowerCase().trim()));
+        }
+      } catch (e) {}
+      checkBanLockStatus();
+    }
+
+    function isUserBanned(username) {
+      if (!username) return false;
+      return dynamicBannedUsers.has(String(username).toLowerCase().replace(/^@/, '').trim());
+    }
+
+    function checkBanLockStatus() {
+      if (myProfile && isUserBanned(myProfile.name)) {
+        const overlay = document.getElementById('ban-lock-overlay');
+        const banId = document.getElementById('ban-lock-id');
+        if (overlay) overlay.classList.remove('hidden');
+        if (banId) banId.textContent = `@${myProfile.name}`;
+      }
+    }
+
+    // --- FUZZY & EVASION NORMALIZER (BANS TYPOS & LEETSPEAK) ---
+    function normalizeEvasionVariants(input) {
+      if (!input) return [];
+      const raw = String(input).toLowerCase();
+
+      // 1. Homoglyphs & Leetspeak substitution map
+      const leetMap = {
+        '@': 'a', '4': 'a', '^': 'a',
+        '8': 'b',
+        '(': 'c', '<': 'c', '{': 'c',
+        '3': 'e', '€': 'e',
+        '6': 'g', '9': 'g',
+        '#': 'h',
+        '1': 'i', '!': 'i', '|': 'i', 'l': 'i',
+        '0': 'o',
+        '5': 's', '$': 's', 'z': 's',
+        '7': 't', '+': 't',
+        'v': 'u',
+        '%': 'x'
+      };
+
+      let substituted = '';
+      for (const char of raw) {
+        substituted += leetMap[char] || char;
+      }
+
+      // 2. Collapse internal separators: "b a d" -> "bad", "b.a.d" -> "bad"
+      const collapsedSeparators = substituted.replace(/[^a-z0-9]/g, '');
+
+      // 3. Remove repeated characters (catches "baaaad" -> "bad")
+      const deduplicated = collapsedSeparators.replace(/(.)\1+/g, '$1');
+
+      // Return variants to inspect
+      return [raw, substituted, collapsedSeparators, deduplicated];
+    }
+
+    // Prohibited phonetic root stems (evaluated against normalized variants)
+    const PROHIBITED_ROOT_PATTERNS = [
+      /f+a+g+[o0]*t*/i,
+      /k+y+s/i,
+      /n+[i!1l]+g+[e3a4]+r*/i,
+      /c+u+n+t/i,
+      /r+e+t+a+r+d/i,
+      /p+[o0]r+n/i,
+      /n+u+d+e/i,
+      /h+e+n+t+a+i/i,
+      /k+i+l+l+y+o+u+r+s+e+l+f/i,
+      /d+i+e+i+n+a+f+i+r+e/i,
+      /d+[i!1l]sc[o0]rd\.gg/i
+    ];
+
+    async function scanContentPreFlight(text) {
+      if (!text) return { passed: true };
+
+      const variants = normalizeEvasionVariants(text);
+      for (const variant of variants) {
+        for (const pattern of PROHIBITED_ROOT_PATTERNS) {
+          if (pattern.test(variant)) {
+            showToast('🚫 AutoMod AI: Typo/Evasion detected! Device banned.', 'error');
+            dynamicBannedUsers.add(myProfile.name.toLowerCase().trim());
+            try {
+              localStorage.setItem('chatteer_banned_users', JSON.stringify(Array.from(dynamicBannedUsers)));
+            } catch(e){}
+            checkBanLockStatus();
+            return { passed: false };
+          }
+        }
+      }
+      return { passed: true };
+    }
+
+    // --- IDENTITY GENERATION ---
+    const ADJECTIVES = ['Swift', 'Cosmic', 'Pixel', 'Nova', 'Hyper', 'Neon', 'Aero', 'Solar', 'Echo', 'Apex'];
+    const NOUNS = ['Pilot', 'Fox', 'Rider', 'Spark', 'Rover', 'Wave', 'Ninja', 'Falcon', 'Wolf', 'Hawk'];
+    const AVATARS = ['🚀', '🦊', '⚡', '👾', '🪐', '🐱', '🐼', '💎', '🌟', '🐬'];
+
+    let myProfile = { name: 'Wolf_1001', avatar: '🐺', karma: 0 };
+
+    function initIdentity() {
+      try {
+        const storedName = localStorage.getItem('chatteer_perm_username');
+        const storedAvatar = localStorage.getItem('chatteer_perm_avatar');
+        if (storedName && !isUserBanned(storedName) && storedAvatar) {
+          myProfile.name = storedName;
+          myProfile.avatar = storedAvatar;
+        } else {
+          const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+          const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+          const num = Math.floor(1000 + Math.random() * 9000);
+          myProfile.name = `${adj}${noun}_${num}`;
+          myProfile.avatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+          localStorage.setItem('chatteer_perm_username', myProfile.name);
+          localStorage.setItem('chatteer_perm_avatar', myProfile.avatar);
+        }
+      } catch (e) {}
+      updateProfileUI();
+      checkBanLockStatus();
+    }
+
+    // --- APP STATE ---
+    let currentRoom = 'global';
+    let allMessages = [];
+    let isAutoScrollActive = true;
+    let activeEventSource = null;
+
+    let currentTab = 'chat';
+    let allPhotos = [];
+
+    // --- DOM REFERENCES ---
+    const chatContainer = document.getElementById('chat-messages-container');
+    const messagesList = document.getElementById('messages-list');
+    const loadingElem = document.getElementById('messages-loading');
+    const welcomeBanner = document.getElementById('welcome-banner');
+    const statusText = document.getElementById('connection-status');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const msgCounter = document.getElementById('msg-counter');
+    const userNameBadge = document.getElementById('user-name-badge');
+    const userAvatarBadge = document.getElementById('user-avatar-badge');
+    const userKarmaBadge = document.getElementById('user-karma-badge');
+    const chatFooterBar = document.getElementById('chat-footer-bar');
+
+    const pageNavBtn = document.getElementById('page-nav-btn');
+    const pageNavIcon = document.getElementById('page-nav-icon');
+    const pageNavLabel = document.getElementById('page-nav-label');
+    const viewChat = document.getElementById('view-chat');
+    const viewPhotos = document.getElementById('view-photos');
+    const photoGrid = document.getElementById('photo-grid');
+    const photoCountBadge = document.getElementById('photo-count-badge');
+    const photoEmptyState = document.getElementById('photo-empty-state');
+
+    // --- KEYBOARD ENGINE ---
+    const customKeyboardDrawer = document.getElementById('custom-keyboard-drawer');
+    const customKeyboardToggle = document.getElementById('custom-keyboard-toggle');
+    const closeCustomKeyboard = document.getElementById('close-custom-keyboard');
+    const kbShiftBtn = document.getElementById('kb-shift-btn');
+    const kbBackspaceBtn = document.getElementById('kb-backspace-btn');
+    const kbSpaceBtn = document.getElementById('kb-space-btn');
+    const kbSendBtn = document.getElementById('kb-send-btn');
+
+    let isKeyboardOpen = false;
+    let isCapsActive = false;
+    let currentKeyboardTarget = messageInput;
+
+    function openCustomKeyboard(targetInput = messageInput) {
+      currentKeyboardTarget = targetInput || messageInput;
+      isKeyboardOpen = true;
+      if (customKeyboardDrawer) {
+        customKeyboardDrawer.classList.remove('translate-y-full');
+      }
+      if (chatFooterBar && currentTab === 'chat') {
+        chatFooterBar.style.paddingBottom = '210px';
+      }
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+
+    function hideCustomKeyboard() {
+      isKeyboardOpen = false;
+      if (customKeyboardDrawer) {
+        customKeyboardDrawer.classList.add('translate-y-full');
+      }
+      if (chatFooterBar) {
+        chatFooterBar.style.paddingBottom = '';
+      }
+    }
+
+    function toggleCapsState() {
+      isCapsActive = !isCapsActive;
+      if (kbShiftBtn) {
+        kbShiftBtn.className = isCapsActive
+          ? 'kb-key flex-[1.3] min-w-0 h-8 sm:h-9 bg-indigo-600 text-white font-black rounded-lg shadow text-xs flex items-center justify-center cursor-pointer ring-1 ring-indigo-400'
+          : 'kb-key flex-[1.3] min-w-0 h-8 sm:h-9 bg-slate-700 hover:bg-slate-600 active:bg-indigo-600 text-white font-black rounded-lg shadow-xs text-xs flex items-center justify-center cursor-pointer';
+      }
+      document.querySelectorAll('.kb-char').forEach(btn => {
+        const txt = btn.textContent;
+        if (isNaN(txt)) {
+          btn.textContent = isCapsActive ? txt.toUpperCase() : txt.toLowerCase();
+        }
+      });
+    }
+
+    function insertChar(char) {
+      if (!currentKeyboardTarget) currentKeyboardTarget = messageInput;
+      const start = currentKeyboardTarget.selectionStart ?? currentKeyboardTarget.value.length;
+      const end = currentKeyboardTarget.selectionEnd ?? currentKeyboardTarget.value.length;
+      const val = currentKeyboardTarget.value;
+      currentKeyboardTarget.value = val.substring(0, start) + char + val.substring(end);
+      currentKeyboardTarget.selectionStart = currentKeyboardTarget.selectionEnd = start + char.length;
+      currentKeyboardTarget.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function handleBackspace() {
+      if (!currentKeyboardTarget) currentKeyboardTarget = messageInput;
+      const start = currentKeyboardTarget.selectionStart ?? currentKeyboardTarget.value.length;
+      const end = currentKeyboardTarget.selectionEnd ?? currentKeyboardTarget.value.length;
+      const val = currentKeyboardTarget.value;
+      if (start === end) {
+        if (start > 0) {
+          currentKeyboardTarget.value = val.substring(0, start - 1) + val.substring(end);
+          currentKeyboardTarget.selectionStart = currentKeyboardTarget.selectionEnd = start - 1;
+        }
+      } else {
+        currentKeyboardTarget.value = val.substring(0, start) + val.substring(end);
+        currentKeyboardTarget.selectionStart = currentKeyboardTarget.selectionEnd = start;
+      }
+      currentKeyboardTarget.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    if (customKeyboardToggle) {
+      customKeyboardToggle.addEventListener('click', () => {
+        if (isKeyboardOpen) hideCustomKeyboard();
+        else openCustomKeyboard(messageInput);
+      });
+    }
+
+    if (closeCustomKeyboard) closeCustomKeyboard.addEventListener('click', hideCustomKeyboard);
+    if (kbShiftBtn) kbShiftBtn.addEventListener('click', toggleCapsState);
+    if (kbBackspaceBtn) kbBackspaceBtn.addEventListener('click', handleBackspace);
+    if (kbSpaceBtn) kbSpaceBtn.addEventListener('click', () => insertChar(' '));
+
+    if (kbSendBtn) {
+      kbSendBtn.addEventListener('click', () => {
+        if (currentKeyboardTarget === messageInput && chatForm) {
+          chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      });
+    }
+
+    document.querySelectorAll('.kb-char').forEach(btn => {
+      btn.addEventListener('click', () => insertChar(btn.textContent));
+    });
+
+    [messageInput].forEach(el => {
+      if (!el) return;
+      el.setAttribute('inputmode', 'none');
+      el.addEventListener('focus', () => openCustomKeyboard(el));
+      el.addEventListener('click', () => openCustomKeyboard(el));
+    });
+
+    // --- CHAT PROTOCOL ---
+    function getRoomTopic(room) {
+      return `chatteer_worldwide_room_${room}`;
+    }
+
+    function renderMessages() {
+      if (!messagesList) return;
+      messagesList.innerHTML = '';
+      if (loadingElem) loadingElem.classList.add('hidden');
+
+      const valid = allMessages.filter(m => !isUserBanned(m.userName));
+      if (valid.length === 0) {
+        if (welcomeBanner) welcomeBanner.classList.remove('hidden');
+        if (msgCounter) msgCounter.textContent = '0 msgs';
+        return;
+      }
+      if (welcomeBanner) welcomeBanner.classList.add('hidden');
+      if (msgCounter) msgCounter.textContent = `${valid.length} msgs`;
+
+      valid.forEach(msg => {
+        const isMe = msg.userName === myProfile.name;
+        const row = document.createElement('div');
+        row.className = `flex items-end gap-1.5 ${isMe ? 'justify-end' : 'justify-start'}`;
+
+        const avatar = `<div class="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-xs shrink-0 select-none">${escapeHtml(msg.userAvatar || '🚀')}</div>`;
+        const bubble = document.createElement('div');
+        bubble.className = `max-w-[85%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+
+        bubble.innerHTML = `
+          <div class="text-[9px] text-slate-400 mb-0.5 px-1">@${escapeHtml(msg.userName)} • ${formatTime(msg.createdAt)}</div>
+          <div class="px-3 py-1.5 rounded-xl ${isMe ? 'bg-indigo-600 text-white rounded-br-xs' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-xs'} text-xs break-words">
+            ${escapeHtml(msg.text || '')}
+          </div>
+        `;
+
+        if (isMe) {
+          row.appendChild(bubble);
+          row.insertAdjacentHTML('beforeend', avatar);
+        } else {
+          row.insertAdjacentHTML('afterbegin', avatar);
+          row.appendChild(bubble);
+        }
+        messagesList.appendChild(row);
+      });
+
+      if (isAutoScrollActive && chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+
+    async function connectToServer(room) {
+      currentRoom = room;
+      if (statusText) statusText.textContent = 'Live';
+      if (activeEventSource) activeEventSource.close();
+
+      try {
+        const res = await fetch(`https://ntfy.sh/${getRoomTopic(room)}/json?poll=1`);
+        if (res.ok) {
+          const text = await res.text();
+          const loaded = [];
+          text.trim().split('\n').forEach(line => {
+            if (!line) return;
+            try {
+              const entry = JSON.parse(line);
+              if (entry.event === 'message' && entry.message) {
+                const p = JSON.parse(entry.message);
+                if (p.type === 'chat_msg' && !isUserBanned(p.userName)) loaded.push(p);
+              }
+            } catch(e){}
+          });
+          allMessages = loaded.sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+          renderMessages();
+        }
+      } catch (e) {}
+
+      try {
+        activeEventSource = new EventSource(`https://ntfy.sh/${getRoomTopic(room)}/sse`);
+        activeEventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.event === 'message' && data.message) {
+              const payload = JSON.parse(data.message);
+              if (payload.type === 'chat_msg' && !isUserBanned(payload.userName)) {
+                if (!allMessages.some(m => m.id === payload.id)) {
+                  allMessages.push(payload);
+                  renderMessages();
+                }
+              }
+            }
+          } catch(e){}
+        };
+      } catch (e) {}
+    }
+
+    async function sendChatMessage(text) {
+      if (isUserBanned(myProfile.name)) return;
+      if (!text) return;
+
+      const scan = await scanContentPreFlight(text);
+      if (!scan.passed) return;
+
+      const newMsg = {
+        id: 'msg_' + Date.now(),
+        roomId: currentRoom,
+        userName: myProfile.name,
+        userAvatar: myProfile.avatar,
+        text: text,
+        createdAt: Date.now(),
+        type: 'chat_msg'
+      };
+
+      allMessages.push(newMsg);
+      renderMessages();
+
+      try {
+        await fetch(`https://ntfy.sh/${getRoomTopic(currentRoom)}`, {
+          method: 'POST',
+          body: JSON.stringify(newMsg)
+        });
+      } catch (e) {}
+    }
+
+    if (chatForm && messageInput && sendButton) {
+      messageInput.addEventListener('input', () => {
+        sendButton.disabled = messageInput.value.trim().length === 0;
+      });
+
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = messageInput.value.trim();
+        if (!text) return;
+        sendChatMessage(text);
+        messageInput.value = '';
+        sendButton.disabled = true;
+      });
+    }
+
+    // --- NAVIGATION ---
+    if (pageNavBtn && viewChat && viewPhotos) {
+      pageNavBtn.addEventListener('click', () => {
+        if (currentTab === 'chat') {
+          currentTab = 'photos';
+          viewChat.classList.add('hidden');
+          viewPhotos.classList.remove('hidden');
+          pageNavIcon.textContent = '💬';
+          pageNavLabel.textContent = 'Chat';
+          hideCustomKeyboard();
+          renderPhotos();
+        } else {
+          currentTab = 'chat';
+          viewPhotos.classList.add('hidden');
+          viewChat.classList.remove('hidden');
+          pageNavIcon.textContent = '📸';
+          pageNavLabel.textContent = 'Photos';
+        }
+      });
+    }
+
+    function renderPhotos() {
+      if (!photoGrid) return;
+      photoGrid.innerHTML = '';
+      const valid = allPhotos.filter(p => !isUserBanned(p.author));
+      if (photoCountBadge) photoCountBadge.textContent = `${valid.length} photos`;
+
+      if (valid.length === 0) {
+        if (photoEmptyState) photoEmptyState.classList.remove('hidden');
+        return;
+      }
+      if (photoEmptyState) photoEmptyState.classList.add('hidden');
+    }
+
+    function updateProfileUI() {
+      if (userNameBadge) userNameBadge.textContent = `@${myProfile.name}`;
+      if (userAvatarBadge) userAvatarBadge.textContent = myProfile.avatar;
+    }
+
+    function escapeHtml(text) {
+      return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatTime(timestamp) {
+      return new Date(timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const t = document.createElement('div');
+      t.className = `px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow ${type === 'error' ? 'bg-red-600' : 'bg-slate-900'}`;
+      t.textContent = msg;
+      container.appendChild(t);
+      setTimeout(() => t.remove(), 2500);
+    }
+
+    // --- BOOTSTRAP ---
+    loadBannedUsers();
+    initIdentity();
+    connectToServer(currentRoom);
+  </script>
+</body>
+</html>
