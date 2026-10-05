@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>chatteer - Worldwide Chat & Photo Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z' fill='%23F7DC4E'/><line x1='34' y1='28' x2='33' y2='52' stroke='%23262D36' stroke-width='7' stroke-linecap='round'/><line x1='55' y1='39' x2='80' y2='42' stroke='%23262D36' stroke-width='7' stroke-linecap='round'/><path d='M 29 60 Q 48 76 68 59' stroke='%23262D36' stroke-width='7' stroke-linecap='round' fill='none'/></svg>">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      touch-action: manipulation;
+    }
+    .brand-font {
+      font-family: 'Outfit', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(241, 245, 249, 0.8);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(165, 180, 252, 0.6);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(129, 140, 248, 0.8);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .mobile-safe-bottom {
+        padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+      }
+      .mobile-safe-bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+    }
+    .kb-key {
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    /* Banned Link Masked with Blurred Hashtags */
+    .banned-link-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      margin: 1px 0;
+      border-radius: 8px;
+      background: rgba(254, 242, 242, 0.95);
+      border: 1px solid rgba(254, 202, 202, 0.9);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+    .banned-link-tag {
+      font-weight: 800;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #dc2626;
+      background: rgba(254, 226, 226, 0.8);
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .banned-link-hashtags {
+      font-family: monospace;
+      font-weight: 800;
+      font-size: 11px;
+      color: #b91c1c;
+      letter-spacing: 1px;
+      filter: blur(4px);
+      transition: filter 0.25s ease;
+    }
+    .banned-link-badge.revealed .banned-link-hashtags {
+      filter: blur(1px);
+    }
+    .banned-link-badge:hover {
+      background: rgba(254, 226, 226, 0.95);
+      border-color: #f87171;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col h-screen overflow-hidden select-none">
+
+  <!-- COMMUNITY RULES & PENALTY GATE -->
+  <div id="rules-gate-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-200">
+      
+      <!-- Rules Header -->
+      <div class="px-5 pt-4 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-gradient-to-r from-slate-50 to-indigo-50/50">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-lg font-bold shadow-md shadow-indigo-500/20">
+            📜
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-black brand-font text-slate-900 leading-tight">Chatteer Rules & Guidelines</h2>
+            <p class="text-[11px] text-slate-500 font-medium">Please review before entering the platform</p>
+          </div>
+        </div>
+        <span class="text-[9px] font-black uppercase tracking-wider bg-red-100 text-red-700 border border-red-200 px-2 py-0.5 rounded-full">
+          Required
+        </span>
+      </div>
+
+      <!-- Scrollable Agreement Body -->
+      <div id="rules-scroll-box" class="flex-1 overflow-y-auto p-4 sm:p-5 text-xs text-slate-700 space-y-4 bg-slate-50/40 leading-relaxed border-b border-slate-200 select-text">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-amber-900 text-[11px] space-y-1">
+          <p class="font-extrabold flex items-center gap-1.5 text-amber-800">
+            <span>⚠️</span> Zero Tolerance Platform Notice
+          </p>
+          <p>
+            Chatteer is equipped with an automated on-device AI Guardian and active moderator controls. All messages, images, and links are analyzed in real time.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="font-black text-slate-900 text-xs sm:text-sm uppercase tracking-wide flex items-center gap-1.5 text-indigo-700">
+            <span>🛡️</span> 1. The Core Community Rules
+          </h3>
+          <ul class="mt-2 space-y-2 pl-1">
+            <li class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+              <strong class="text-slate-900 block font-bold mb-0.5">Rule 1: Zero Tolerance for Harassment & Hate Speech</strong>
+              Bullying, discrimination, violent remarks, and slurs are strictly prohibited. Evasion attempts (including typos, leetspeak, spaces, and symbol substitutions) are blocked by the filter.
+            </li>
+            <li class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+              <strong class="text-slate-900 block font-bold mb-0.5">Rule 2: No Explicit or Inappropriate Imagery</strong>
+              All shared images must be safe for general audiences. Every uploaded photo is scanned pre-upload by on-device safety algorithms.
+            </li>
+            <li class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+              <strong class="text-slate-900 block font-bold mb-0.5">Rule 3: No External Links Allowed</strong>
+              To prevent phishing, scams, and unsafe sites, posting external links is banned. All links and domains are automatically masked with blurred hashtags (<code class="font-mono text-red-600 bg-red-50 px-1 rounded">########</code>).
+            </li>
+            <li class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+              <strong class="text-slate-900 block font-bold mb-0.5">Rule 4: Authentic Identity & No Spoofing</strong>
+              Moderator identity (<code class="text-indigo-600 font-bold">@PixelWolf_8390</code>) is protected and requires valid administrative PIN credentials.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-black text-slate-900 text-xs sm:text-sm uppercase tracking-wide flex items-center gap-1.5 text-red-600">
+            <span>⚖️</span> 2. Violations & Punishments
+          </h3>
+          <div class="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xs">
+            <div class="grid grid-cols-3 bg-slate-100 p-2 text-[10px] font-black uppercase text-slate-600 border-b border-slate-200">
+              <div>Level</div>
+              <div>Violation</div>
+              <div>Penalty</div>
+            </div>
+            <div class="divide-y divide-slate-100 text-[11px]">
+              <div class="grid grid-cols-3 p-2 gap-1 items-center">
+                <span class="font-bold text-amber-600">Filter Block</span>
+                <span class="text-slate-600">Minor filter triggers</span>
+                <span class="font-medium text-slate-800">Message stopped prior to sending.</span>
+              </div>
+              <div class="grid grid-cols-3 p-2 gap-1 items-center bg-slate-50/50">
+                <span class="font-bold text-orange-600">URL Masking</span>
+                <span class="text-slate-600">External web links</span>
+                <span class="font-medium text-slate-800">Masked with blurred hashtags.</span>
+              </div>
+              <div class="grid grid-cols-3 p-2 gap-1 items-center">
+                <span class="font-bold text-red-600">Permanent Ban</span>
+                <span class="text-slate-600">Harassment or graphic uploads</span>
+                <span class="font-bold text-red-700">Account blacklisted and scrubbed.</span>
+              </div>
+              <div class="grid grid-cols-3 p-2 gap-1 items-center bg-slate-50/50">
+                <span class="font-bold text-indigo-600">Mod Purge</span>
+                <span class="text-slate-600">Manual review</span>
+                <span class="font-medium text-slate-800">Removal or complete worldwide wipe by @PixelWolf_8390.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-100 rounded-xl text-center text-slate-500 text-[11px]">
+          <p>Please confirm your agreement below to enter Chatteer.</p>
+        </div>
+      </div>
+
+      <!-- Bottom Acceptance Section -->
+      <div class="p-4 bg-white shrink-0 space-y-3">
+        <p id="scroll-down-notice" class="text-[11px] text-amber-600 font-bold flex items-center gap-1">
+          <span>⬇️</span> Scroll down completely to unlock the agreement
+        </p>
+
+        <label class="flex items-start gap-2.5 cursor-pointer text-xs font-semibold text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100/70 transition-colors">
+          <input
+            type="checkbox"
+            id="rules-agree-checkbox"
+            disabled
+            class="mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+          />
+          <span class="leading-tight select-none">
+            I agree to follow all community rules and understand that breaking them will result in an account ban.
+          </span>
+        </label>
+
+        <button
+          id="enter-chatteer-btn"
+          type="button"
+          disabled
+          class="w-full py-2.5 px-4 bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-500 active:scale-98 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+        >
+          <span>Enter Chatteer</span>
+          <span>→</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PERMANENT AUTO-BAN OVERLAY -->
+  <div id="ban-lock-overlay" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center border-2 border-red-500 shadow-2xl space-y-4">
+      <div class="w-16 h-16 rounded-full bg-red-100 border-2 border-red-300 flex items-center justify-center text-3xl mx-auto shadow-inner">
+        🚫
+      </div>
+      <div>
+        <h2 class="text-xl font-black brand-font text-slate-900">Access Restricted</h2>
+        <p class="text-xs text-red-600 font-bold uppercase tracking-wider mt-1">Chatteer Moderation Enforcement</p>
+      </div>
+      <p id="ban-lock-reason" class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-2xl border border-slate-200">
+        This account has been restricted by Chatteer moderation.
+      </p>
+      <div class="text-[11px] text-slate-400 font-mono">
+        Identifier: <span id="ban-lock-id" class="text-red-500 font-bold">LOCKED</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PIN & MODERATION HUB MODAL -->
+  <div id="admin-pin-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 text-center space-y-4">
+      <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mx-auto border border-amber-300 shadow-sm">
+        🛡
+      </div>
+
+      <!-- Login Section -->
+      <div id="admin-pin-login-section" class="space-y-3">
+        <div>
+          <h3 class="text-base font-black brand-font text-slate-900">Moderator Access</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Enter Security PIN for @PixelWolf_8390</p>
+        </div>
+        <input
+          id="admin-pin-input"
+          type="password"
+          maxlength="8"
+          placeholder="Enter PIN"
+          class="w-full text-center tracking-widest text-lg font-mono font-bold bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500"
+        />
+        <p id="admin-pin-error" class="hidden text-xs text-red-600 font-bold">Incorrect PIN. Access denied.</p>
+        <div class="flex items-center gap-2 pt-1">
+          <button id="admin-pin-cancel-btn" type="button" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">
+            Cancel
+          </button>
+          <button id="admin-pin-submit-btn" type="button" class="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-md shadow-amber-500/20 cursor-pointer">
+            Verify PIN
+          </button>
+        </div>
+      </div>
+
+      <!-- Moderator Dashboard (Unlocked when PIN 9050 is entered) -->
+      <div id="admin-dashboard-section" class="hidden space-y-3 text-left">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div>
+            <h3 class="text-sm font-black brand-font text-slate-900">Mod Dashboard</h3>
+            <p class="text-[10px] text-emerald-600 font-bold">● Active: @PixelWolf_8390</p>
+          </div>
+          <button id="admin-dashboard-close-btn" type="button" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 text-xs font-bold flex items-center justify-center cursor-pointer">✕</button>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 mb-1 block">Quick Ban / Unban User</label>
+          <div class="flex items-center gap-1.5">
+            <input
+              id="mod-target-user-input"
+              type="text"
+              placeholder="Username without @"
+              class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            />
+            <button id="mod-quick-ban-btn" type="button" class="px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold cursor-pointer">
+              Ban
+            </button>
+            <button id="mod-quick-unban-btn" type="button" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer">
+              Unban
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[11px] font-bold text-slate-600">Banned Accounts</span>
+            <span id="banned-count-badge" class="text-[10px] bg-red-100 text-red-700 font-bold px-1.5 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="banned-accounts-list" class="max-h-28 overflow-y-auto space-y-1 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
+            <p class="text-slate-400 text-center py-2 text-[11px]">No accounts currently banned.</p>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <button id="mod-wipe-everything-btn" type="button" class="w-full py-2 bg-red-600 hover:bg-red-700 active:scale-98 text-white font-extrabold text-xs rounded-xl shadow-md cursor-pointer transition-all flex items-center justify-center gap-1">
+            <span>💥 Wipe All Uploads Now</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- UPLOAD PHOTO MODAL -->
+  <div id="upload-photo-modal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-4 sm:p-5 shadow-2xl border border-slate-200 space-y-3 max-h-[92vh] flex flex-col overflow-y-auto">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-sm font-bold">
+            📷
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm text-slate-900 brand-font leading-none">Upload Photo</h3>
+            <p class="text-[10px] text-slate-400 font-medium mt-0.5">Select an image from your device</p>
+          </div>
+        </div>
+        <button id="close-upload-modal-btn" type="button" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold cursor-pointer">✕</button>
+      </div>
+
+      <!-- Hidden Native File Input -->
+      <input id="photo-file-input" type="file" accept="image/*" class="hidden" />
+
+      <!-- Drag & Drop / Tap to Choose File Box -->
+      <div
+        id="photo-drop-zone"
+        class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 hover:bg-indigo-50/70 rounded-2xl p-4 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group relative overflow-hidden"
+      >
+        <div id="upload-placeholder" class="space-y-1.5 py-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl mx-auto shadow-xs group-hover:scale-105 transition-transform">
+            🖼️
+          </div>
+          <p class="text-xs font-bold text-slate-800">Tap to browse photos</p>
+          <p class="text-[10px] text-slate-400">JPG, PNG, WEBP, or GIF</p>
+        </div>
+
+        <div id="upload-preview-container" class="hidden w-full space-y-2">
+          <div class="relative w-full aspect-square max-h-48 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+            <img id="upload-preview-img" src="" alt="Selected Preview" class="w-full h-full object-cover" />
+            <div id="ai-scan-laser" class="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#22d3ee] animate-pulse"></div>
+
+            <button
+              id="change-photo-btn"
+              type="button"
+              class="absolute top-2 right-2 bg-slate-900/80 hover:bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded-lg backdrop-blur-xs cursor-pointer shadow"
+            >
+              Change
+            </button>
+          </div>
+
+          <div id="ai-scan-status" class="py-1 px-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+            <span>AI Guardian: Scanning pixels...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caption -->
+      <div>
+        <label class="text-[11px] font-bold text-slate-600 mb-1 block">Caption (optional)</label>
+        <input
+          id="photo-caption-input"
+          type="text"
+          maxlength="80"
+          placeholder="Say something nice..."
+          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        />
+      </div>
+
+      <div class="flex items-center gap-2 pt-1 shrink-0">
+        <button id="cancel-upload-btn" type="button" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">
+          Cancel
+        </button>
+        <button
+          id="submit-upload-btn"
+          type="button"
+          disabled
+          class="flex-1 py-2 rounded-xl bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-500/20 cursor-pointer transition-all"
+        >
+          Post Photo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP HEADER -->
+  <header class="bg-white/95 border-b border-slate-200/90 backdrop-blur-md px-3 sm:px-5 py-2 shrink-0 flex items-center justify-between z-20 shadow-sm">
+    <div class="flex items-center space-x-2 sm:space-x-3">
+      <div class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 drop-shadow hover:scale-105 transition-transform cursor-pointer" title="chatteer mascot">
+        <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z" fill="#F7DC4E"/>
+          <line x1="34" y1="28" x2="33" y2="52" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+          <line x1="55" y1="39" x2="80" y2="42" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M 29 60 Q 48 76 68 59" stroke="#262D36" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <h1 class="brand-font text-lg sm:text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+            chatteer
+          </h1>
+          <span class="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full flex items-center gap-1">
+            <span id="connection-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="connection-status">Live</span>
+          </span>
+          <span id="mod-active-badge" class="hidden px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-700 border border-red-300 rounded-full flex items-center gap-1 shadow-xs animate-pulse">
+            🛡 Mod
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="flex items-center gap-1.5 sm:gap-3">
+      <button id="view-rules-btn" type="button" title="View Community Rules & Penalties" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 font-bold text-xs cursor-pointer active:scale-95 flex items-center gap-1">
+        <span>📜</span>
+        <span class="hidden sm:inline">Rules</span>
+      </button>
+
+      <button id="page-nav-btn" type="button" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer">
+        <span id="page-nav-icon">📸</span>
+        <span id="page-nav-label">Photos</span>
+      </button>
+
+      <!-- Moderator Access Trigger -->
+      <div id="profile-toggle-btn" title="Tap for Moderator Access & Ban Controls" class="flex items-center gap-1.5 px-2 py-1 rounded-2xl bg-gradient-to-r from-slate-100 to-amber-50/70 border border-slate-200/90 shadow-xs text-left select-none cursor-pointer hover:border-amber-400 transition-all active:scale-95">
+        <span id="user-avatar-badge" class="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-xs">🐺</span>
+        <div class="flex flex-col pr-0.5">
+          <div class="flex items-center gap-1">
+            <span id="user-karma-badge" class="text-[8px] sm:text-[9px] font-extrabold uppercase text-amber-600 bg-amber-100/70 px-1 rounded">Online</span>
+            <span class="text-[8px] text-slate-400" title="Tap to login as admin">🔑</span>
+          </div>
+          <span id="user-name-badge" class="text-[11px] font-bold text-slate-800 max-w-[80px] sm:max-w-[120px] truncate leading-none mt-0.5">@Wolf</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CHAT VIEW CONTAINER -->
+  <div id="view-chat" class="flex flex-col flex-1 overflow-hidden pb-14 sm:pb-0">
+    <div class="bg-white/80 border-b border-slate-200 px-3 py-1.5 flex items-center justify-between text-xs text-slate-500">
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <button type="button" data-room="global" class="room-btn active px-2.5 py-0.5 rounded-lg bg-indigo-100/70 text-indigo-700 border border-indigo-300 font-semibold text-xs cursor-pointer">
+          # global
+        </button>
+        <button type="button" data-room="chill" class="room-btn px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 text-xs cursor-pointer">
+          # chill
+        </button>
+        <button type="button" data-room="gaming" class="room-btn px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 text-xs cursor-pointer">
+          # gaming
+        </button>
+      </div>
+      <span id="msg-counter" class="text-[11px] text-slate-400 font-medium">0 msgs</span>
+    </div>
+
+    <!-- Messages List -->
+    <main class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 relative select-text bg-slate-50/60" id="chat-messages-container">
+      <div id="messages-loading" class="flex flex-col items-center justify-center py-16 text-slate-400 space-y-2">
+        <div class="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-xs font-medium">Connecting to clean channel...</p>
+      </div>
+      
+      <div id="welcome-banner" class="hidden text-center max-w-sm mx-auto py-6 px-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <div class="w-12 h-12 mx-auto mb-2">
+          <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 C28 10 10 27 10 47.5 C10 56.8 13.8 65.2 20.2 71.3 C19.2 77.8 16.5 86.8 15.5 90 C19.2 88.8 27.5 85 32.8 81.6 C38 84 43.8 85 50 85 C72 85 90 68 90 47.5 C90 27 72 10 50 10 Z" fill="#F7DC4E"/>
+            <line x1="34" y1="28" x2="33" y2="52" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+            <line x1="55" y1="39" x2="80" y2="42" stroke="#262D36" stroke-width="6.5" stroke-linecap="round"/>
+            <path d="M 29 60 Q 48 76 68 59" stroke="#262D36" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-slate-800 text-sm">Welcome to Chatteer!</h3>
+        <p class="text-[11px] text-slate-500 mt-0.5">Send a message to say hello to everyone online.</p>
+      </div>
+
+      <div id="messages-list" class="space-y-3 max-w-3xl mx-auto pb-2"></div>
+    </main>
+
+    <!-- Chat Input Footer -->
+    <footer id="chat-footer-bar" class="bg-white/95 border-t border-slate-200 p-2 sm:p-3 shrink-0 backdrop-blur-md z-20 shadow-sm transition-all duration-200">
+      <div class="max-w-3xl mx-auto">
+        <!-- Quick Emojis -->
+        <div class="flex items-center gap-1 pb-1.5 overflow-x-auto no-scrollbar text-base">
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">👋</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">✨</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">🔥</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">🎉</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">❤️</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">😂</button>
+          <button type="button" class="quick-emoji px-1.5 py-0.5 rounded hover:bg-slate-100">💯</button>
+        </div>
+
+        <form id="chat-form" class="flex items-center gap-1.5">
+          <button id="custom-keyboard-toggle" type="button" title="Toggle On-Screen Keyboard" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer shrink-0 text-sm">
+            ⌨️
+          </button>
+
+          <button id="chat-upload-photo-btn" type="button" title="Upload Photo from Device" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer shrink-0 text-sm">
+            📷
+          </button>
+
+          <div class="relative flex-1">
+            <input
+              id="message-input"
+              type="text"
+              maxlength="400"
+              placeholder="Type your message..."
+              autocomplete="off"
+              class="w-full bg-slate-50 text-slate-900 placeholder-slate-400 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 border border-slate-200 shadow-inner"
+            />
+          </div>
+
+          <button
+            type="submit"
+            id="send-button"
+            disabled
+            class="bg-indigo-600 disabled:opacity-40 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center justify-center shrink-0 cursor-pointer"
+          >
+            <span>Send</span>
+          </button>
+        </form>
+      </div>
+    </footer>
+  </div>
+
+  <!-- PHOTOS VIEW CONTAINER -->
+  <div id="view-photos" class="hidden flex flex-col flex-1 overflow-hidden bg-slate-50 pb-14 sm:pb-0">
+    <div class="bg-white border-b border-slate-200 px-3 py-2 shrink-0">
+      <div class="max-w-4xl mx-auto flex items-center justify-between gap-2">
+        <input
+          id="photo-search-input"
+          type="text"
+          placeholder="Search photos..."
+          class="flex-1 bg-slate-100 text-slate-800 px-3 py-1.5 rounded-xl text-xs border border-slate-200 focus:outline-none"
+        />
+        <button id="open-upload-btn" type="button" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-indigo-600 text-white font-bold text-xs cursor-pointer active:scale-95">
+          + Post
+        </button>
+      </div>
+      <div class="max-w-4xl mx-auto mt-2 flex items-center justify-between gap-2 text-xs">
+        <span id="photo-count-badge" class="text-[11px] text-slate-400">0 photos</span>
+      </div>
+    </div>
+
+    <!-- Photo Gallery Grid -->
+    <div class="flex-1 overflow-y-auto p-3" id="photo-feed-container">
+      <div class="max-w-4xl mx-auto">
+        <div id="photo-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+        <div id="photo-empty-state" class="text-center py-12 text-slate-400">
+          <p class="text-xs">No photos yet! Be the first to share an image.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPACT ON-SCREEN KEYBOARD DRAWER -->
+  <div id="custom-keyboard-drawer" class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/98 backdrop-blur-xl border-t border-slate-700 p-1 sm:p-2 shadow-2xl transition-transform duration-200 transform translate-y-full select-none mobile-safe-bottom">
+    <div class="w-full max-w-md mx-auto flex flex-col gap-1">
+      <div class="flex items-center justify-between px-1.5 py-0.5 text-slate-300 text-[10px]">
+        <span class="font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1">
+          <span>⌨️️</span> chatteer keys
+        </span>
+        <button id="close-custom-keyboard" type="button" class="px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] cursor-pointer active:scale-95">
+          Done ✓
+        </button>
+      </div>
+
+      <!-- Numbers Row (1 to 0) -->
+      <div class="grid grid-cols-10 gap-0.5 sm:gap-1">
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">1</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">2</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">3</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">4</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">5</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">6</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">7</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">8</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">9</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">0</button>
+      </div>
+
+      <!-- Letters Row 1 (Q to P) -->
+      <div class="grid grid-cols-10 gap-0.5 sm:gap-1">
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">q</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">w</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">e</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">r</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">t</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">y</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">u</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">i</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">o</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">p</button>
+      </div>
+
+      <!-- Letters Row 2 (A to L) -->
+      <div class="grid grid-cols-9 gap-0.5 sm:gap-1 px-2 sm:px-3">
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">a</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">s</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">d</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">f</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">g</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">h</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">j</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">k</button>
+        <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">l</button>
+      </div>
+
+      <!-- Letters Row 3: Shift + Z-M + Backspace -->
+      <div class="flex items-center gap-0.5 sm:gap-1">
+        <button id="kb-shift-btn" type="button" class="kb-key flex-[1.3] min-w-0 h-8 sm:h-9 bg-slate-700 hover:bg-slate-600 active:bg-indigo-600 text-white font-black rounded-lg shadow-xs text-xs flex items-center justify-center cursor-pointer">
+          ⇧
+        </button>
+        <div class="grid grid-cols-7 gap-0.5 sm:gap-1 flex-[7] min-w-0">
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">z</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">x</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">c</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">v</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">b</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">n</button>
+          <button type="button" class="kb-key kb-char min-w-0 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold rounded-lg shadow-xs text-xs sm:text-sm flex items-center justify-center cursor-pointer">m</button>
+        </div>
+        <button id="kb-backspace-btn" type="button" class="kb-key flex-[1.3] min-w-0 h-8 sm:h-9 bg-slate-700 hover:bg-slate-600 active:bg-rose-600 text-white font-black rounded-lg shadow-xs text-xs flex items-center justify-center cursor-pointer">
+          ⌫
+        </button>
+      </div>
+
+      <!-- Bottom Space & Send Row -->
+      <div class="flex items-center gap-1 sm:gap-1.5 pt-0.5">
+        <button id="kb-space-btn" type="button" class="kb-key flex-1 h-8 sm:h-9 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 font-bold rounded-lg shadow-xs text-xs tracking-wider uppercase flex items-center justify-center cursor-pointer">
+          Space
+        </button>
+        <button id="kb-send-btn" type="button" class="kb-key px-4 sm:px-6 h-8 sm:h-9 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold rounded-lg shadow-xs text-xs flex items-center justify-center cursor-pointer">
+          ↵ Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed top-14 right-3 z-50 flex flex-col gap-1.5 pointer-events-none"></div>
+
+  <!-- APPLICATION SCRIPT -->
+  <script type="module">
+    const MOD_ACCOUNT_NAME = 'PixelWolf_8390';
+    const MOD_SECURITY_PIN = '9050';
+    let isSuperModActive = false;
+
+    let currentChannelNamespace = localStorage.getItem('chatteer_channel_v') || 'chatteer_clean_v4';
+
+    function getRoomTopic(room) {
+      return `${currentChannelNamespace}_room_${room}`;
+    }
+
+    function getPhotosTopic() {
+      return `${currentChannelNamespace}_photos_hub`;
+    }
+
+    let dynamicBannedUsers = new Set(['turboviper_1118']);
+
+    function loadBannedUsers() {
+      try {
+        const stored = JSON.parse(localStorage.getItem('chatteer_banned_users') || '[]');
+        if (Array.isArray(stored)) {
+          stored.forEach(u => dynamicBannedUsers.add(String(u).toLowerCase().trim()));
+        }
+      } catch (e) {}
+      checkBanLockStatus();
+      updateBannedUsersListUI();
+    }
+
+    function saveBannedUsers() {
+      try {
+        localStorage.setItem('chatteer_banned_users', JSON.stringify(Array.from(dynamicBannedUsers)));
+      } catch (e) {}
+    }
+
+    function isUserBanned(username) {
+      if (!username) return false;
+      return dynamicBannedUsers.has(String(username).toLowerCase().replace(/^@/, '').trim());
+    }
+
+    function banUserAccount(username) {
+      if (!username) return;
+      const clean = String(username).toLowerCase().replace(/^@/, '').trim();
+      if (clean === MOD_ACCOUNT_NAME.toLowerCase()) {
+        showToast('Cannot ban moderator account', 'error');
+        return;
+      }
+      dynamicBannedUsers.add(clean);
+      saveBannedUsers();
+      updateBannedUsersListUI();
+      renderMessages();
+      renderPhotos();
+      checkBanLockStatus();
+      showToast(`🚫 Account @${clean} has been banned.`);
+    }
+
+    function unbanUserAccount(username) {
+      if (!username) return;
+      const clean = String(username).toLowerCase().replace(/^@/, '').trim();
+      if (dynamicBannedUsers.has(clean)) {
+        dynamicBannedUsers.delete(clean);
+        saveBannedUsers();
+        updateBannedUsersListUI();
+        renderMessages();
+        renderPhotos();
+        
+        if (myProfile && myProfile.name.toLowerCase() === clean) {
+          const overlay = document.getElementById('ban-lock-overlay');
+          if (overlay) overlay.classList.add('hidden');
+        }
+        showToast(`✅ Account @${clean} has been unbanned!`);
+      } else {
+        showToast(`User @${clean} is not banned.`, 'info');
+      }
+    }
+
+    function checkBanLockStatus() {
+      if (myProfile && isUserBanned(myProfile.name)) {
+        const overlay = document.getElementById('ban-lock-overlay');
+        const banId = document.getElementById('ban-lock-id');
+        const banReason = document.getElementById('ban-lock-reason');
+        if (overlay) overlay.classList.remove('hidden');
+        if (banId) banId.textContent = `@${myProfile.name}`;
+        if (banReason) banReason.textContent = 'Your user account has been restricted by Chatteer moderation.';
+      }
+    }
+
+    function formatLinksAsHashtags(rawText) {
+      const escaped = escapeHtml(rawText);
+      const urlRegex = /(https?:\/\/[^\s<]+|www\.[^\s<]+|[a-zA-Z0-9-]+\.(?:com|org|net|io|co|gg|xyz|app|me|edu|gov)[^\s<]*)/gi;
+
+      return escaped.replace(urlRegex, (match) => {
+        const length = Math.max(8, Math.min(match.length, 20));
+        const maskedHashtags = '#'.repeat(length);
+        return `
+          <span class="banned-link-badge" onclick="this.classList.toggle('revealed')" title="External links are banned on Chatteer">
+            <span class="banned-link-tag">🚫 Link</span>
+            <span class="banned-link-hashtags">${maskedHashtags}</span>
+          </span>
+        `;
+      });
+    }
+
+    function normalizeEvasionVariants(input) {
+      if (!input) return [];
+      const raw = String(input).toLowerCase();
+      const leetMap = {
+        '@': 'a', '4': 'a', '^': 'a',
+        '8': 'b', '(': 'c', '<': 'c', '{': 'c',
+        '3': 'e', '€': 'e', '6': 'g', '9': 'g',
+        '#': 'h', '1': 'i', '!': 'i', '|': 'i', 'l': 'i',
+        '0': 'o', '5': 's', '$': 's', 'z': 's',
+        '7': 't', '+': 't', 'v': 'u'
+      };
+
+      let substituted = '';
+      for (const char of raw) {
+        substituted += leetMap[char] || char;
+      }
+
+      const collapsed = substituted.replace(/[^a-z0-9]/g, '');
+      const deduplicated = collapsed.replace(/(.)\1+/g, '$1');
+      return [raw, substituted, collapsed, deduplicated];
+    }
+
+    const PROHIBITED_PATTERNS = [
+      /f+a+g+[o0]*t*/i,
+      /k+y+s/i,
+      /n+[i!1l]+g+[e3a4]+r*/i,
+      /c+u+n+t/i,
+      /r+e+t+a+r+d/i,
+      /p+[o0]r+n/i,
+      /n+u+d+e/i,
+      /h+e+n+t+a+i/i,
+      /k+i+l+l+y+o+u+r+s+e+l+f/i
+    ];
+
+    async function scanContentPreFlight(text) {
+      if (!text) return { passed: true };
+      const variants = normalizeEvasionVariants(text);
+      for (const variant of variants) {
+        for (const pattern of PROHIBITED_PATTERNS) {
+          if (pattern.test(variant)) {
+            showToast('🚫 Prohibited language detected.', 'error');
+            banUserAccount(myProfile.name);
+            return { passed: false };
+          }
+        }
+      }
+      return { passed: true };
+    }
+
+    const ADJECTIVES = ['Swift', 'Cosmic', 'Pixel', 'Nova', 'Hyper', 'Neon', 'Aero', 'Solar', 'Echo', 'Apex'];
+    const NOUNS = ['Pilot', 'Fox', 'Rider', 'Spark', 'Rover', 'Wave', 'Ninja', 'Falcon', 'Wolf', 'Hawk'];
+    const AVATARS = ['🚀', '🦊', '⚡', '👾', '🪐', '🐱', '🐼', '💎', '🌟', '🐬'];
+
+    let myProfile = { name: 'Wolf_1001', avatar: '🐺', karma: 0 };
+
+    function initIdentity() {
+      try {
+        const isModSaved = localStorage.getItem('chatteer_is_supermod') === 'true';
+        const storedName = localStorage.getItem('chatteer_perm_username');
+        const storedAvatar = localStorage.getItem('chatteer_perm_avatar');
+
+        if (isModSaved && storedName === MOD_ACCOUNT_NAME) {
+          myProfile.name = MOD_ACCOUNT_NAME;
+          myProfile.avatar = '🐺';
+          isSuperModActive = true;
+          setModeratorUI(true);
+        } else if (storedName && !isUserBanned(storedName) && storedAvatar) {
+          myProfile.name = storedName;
+          myProfile.avatar = storedAvatar;
+        } else {
+          const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+          const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+          const num = Math.floor(1000 + Math.random() * 9000);
+          myProfile.name = `${adj}${noun}_${num}`;
+          myProfile.avatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+          localStorage.setItem('chatteer_perm_username', myProfile.name);
+          localStorage.setItem('chatteer_perm_avatar', myProfile.avatar);
+        }
+      } catch (e) {}
+      updateProfileUI();
+      checkBanLockStatus();
+    }
+
+    function setModeratorUI(active) {
+      const badge = document.getElementById('mod-active-badge');
+      if (badge) {
+        if (active) badge.classList.remove('hidden');
+        else badge.classList.add('hidden');
+      }
+    }
+
+    // Modal and Dashboard elements
+    const profileToggleBtn = document.getElementById('profile-toggle-btn');
+    const adminPinModal = document.getElementById('admin-pin-modal');
+    const adminPinInput = document.getElementById('admin-pin-input');
+    const adminPinSubmitBtn = document.getElementById('admin-pin-submit-btn');
+    const adminPinCancelBtn = document.getElementById('admin-pin-cancel-btn');
+    const adminPinError = document.getElementById('admin-pin-error');
+    const adminPinLoginSection = document.getElementById('admin-pin-login-section');
+    const adminDashboardSection = document.getElementById('admin-dashboard-section');
+    const adminDashboardCloseBtn = document.getElementById('admin-dashboard-close-btn');
+    const bannedAccountsList = document.getElementById('banned-accounts-list');
+    const bannedCountBadge = document.getElementById('banned-count-badge');
+    const modTargetUserInput = document.getElementById('mod-target-user-input');
+    const modQuickUnbanBtn = document.getElementById('mod-quick-unban-btn');
+    const modQuickBanBtn = document.getElementById('mod-quick-ban-btn');
+    const modWipeEverythingBtn = document.getElementById('mod-wipe-everything-btn');
+
+    function openAdminModal() {
+      if (!adminPinModal) return;
+      adminPinModal.classList.remove('hidden');
+      if (isSuperModActive) {
+        if (adminPinLoginSection) adminPinLoginSection.classList.add('hidden');
+        if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
+        updateBannedUsersListUI();
+      } else {
+        if (adminPinLoginSection) adminPinLoginSection.classList.remove('hidden');
+        if (adminDashboardSection) adminDashboardSection.classList.add('hidden');
+        if (adminPinInput) {
+          adminPinInput.value = '';
+          adminPinInput.focus();
+        }
+        if (adminPinError) adminPinError.classList.add('hidden');
+      }
+    }
+
+    function closeAdminModal() {
+      if (adminPinModal) adminPinModal.classList.add('hidden');
+    }
+
+    function verifyAdminPIN() {
+      const pin = adminPinInput ? adminPinInput.value.trim() : '';
+      if (pin === MOD_SECURITY_PIN) {
+        isSuperModActive = true;
+        myProfile.name = MOD_ACCOUNT_NAME;
+        myProfile.avatar = '🐺';
+        try {
+          localStorage.setItem('chatteer_is_supermod', 'true');
+          localStorage.setItem('chatteer_perm_username', MOD_ACCOUNT_NAME);
+          localStorage.setItem('chatteer_perm_avatar', '🐺');
+        } catch(e){}
+
+        updateProfileUI();
+        setModeratorUI(true);
+        if (adminPinLoginSection) adminPinLoginSection.classList.add('hidden');
+        if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
+        updateBannedUsersListUI();
+        renderMessages();
+        renderPhotos();
+        showToast('🛡️ Welcome, Moderator @' + MOD_ACCOUNT_NAME + '!', 'info');
+      } else {
+        if (adminPinError) adminPinError.classList.remove('hidden');
+        if (adminPinInput) adminPinInput.select();
+      }
+    }
+
+    function purgeAllUploadedDataLocally() {
+      allMessages = [];
+      allPhotos = [];
+      renderMessages();
+      renderPhotos();
+    }
+
+    async function triggerWorldwideWipe() {
+      if (!isSuperModActive) return;
+      const newVersion = 'chatteer_clean_v' + Date.now();
+      currentChannelNamespace = newVersion;
+      try {
+        localStorage.setItem('chatteer_channel_v', newVersion);
+      } catch (e) {}
+
+      try {
+        await fetch(`https://ntfy.sh/${getRoomTopic(currentRoom)}`, {
+          method: 'POST',
+          body: JSON.stringify({ type: 'system_purge_all', newVersion: newVersion })
+        });
+        await fetch(`https://ntfy.sh/${getPhotosTopic()}`, {
+          method: 'POST',
+          body: JSON.stringify({ type: 'system_purge_all', newVersion: newVersion })
+        });
+      } catch (e) {}
+
+      purgeAllUploadedDataLocally();
+      connectToServer(currentRoom);
+      connectToPhotosServer();
+      closeAdminModal();
+      showToast('💥 All messages and photos have been cleared.');
+    }
+
+    if (modWipeEverythingBtn) modWipeEverythingBtn.addEventListener('click', triggerWorldwideWipe);
+
+    function updateBannedUsersListUI() {
+      if (!bannedAccountsList) return;
+      bannedAccountsList.innerHTML = '';
+      const list = Array.from(dynamicBannedUsers);
+      if (bannedCountBadge) bannedCountBadge.textContent = list.length;
+
+      if (list.length === 0) {
+        bannedAccountsList.innerHTML = '<p class="text-slate-400 text-center py-2 text-[11px]">No accounts currently banned.</p>';
+        return;
+      }
+
+      list.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-1.5 bg-white border border-slate-200 rounded-lg shadow-2xs';
+        item.innerHTML = `
+          <span class="font-bold text-slate-800 text-[11px]">@${escapeHtml(user)}</span>
+          <button type="button" class="px-2 py-0.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-[10px] font-black rounded-md cursor-pointer transition-colors" onclick="window.chatteerUnbanUser('${user}')">
+            Unban
+          </button>
+        `;
+        bannedAccountsList.appendChild(item);
+      });
+    }
+
+    window.chatteerUnbanUser = (u) => unbanUserAccount(u);
+    window.chatteerBanUser = (u) => banUserAccount(u);
+
+    if (profileToggleBtn) profileToggleBtn.addEventListener('click', openAdminModal);
+    if (adminPinCancelBtn) adminPinCancelBtn.addEventListener('click', closeAdminModal);
+    if (adminDashboardCloseBtn) adminDashboardCloseBtn.addEventListener('click', closeAdminModal);
+    if (adminPinSubmitBtn) adminPinSubmitBtn.addEventListener('click', verifyAdminPIN);
+    if (adminPinInput) {
+      adminPinInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') verifyAdminPIN();
+      });
+    }
+
+    if (modQuickUnbanBtn) {
+      modQuickUnbanBtn.addEventListener('click', () => {
+        if (!modTargetUserInput) return;
+        const val = modTargetUserInput.value.trim();
+        if (val) {
+          unbanUserAccount(val);
+          modTargetUserInput.value = '';
+        }
+      });
+    }
+
+    if (modQuickBanBtn) {
+      modQuickBanBtn.addEventListener('click', () => {
+        if (!modTargetUserInput) return;
+        const val = modTargetUserInput.value.trim();
+        if (val) {
+          banUserAccount(val);
+          modTargetUserInput.value = '';
+        }
+      });
+    }
+
+    // App State
+    let currentRoom = 'global';
+    let allMessages = [];
+    let isAutoScrollActive = true;
+    let activeEventSource = null;
+    let photosEventSource = null;
+
+    let currentTab = 'chat';
+    let allPhotos = [];
+
+    // DOM references
+    const chatContainer = document.getElementById('chat-messages-container');
+    const messagesList = document.getElementById('messages-list');
+    const loadingElem = document.getElementById('messages-loading');
+    const welcomeBanner = document.getElementById('welcome-banner');
+    const statusText = document.getElementById('connection-status');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const msgCounter = document.getElementById('msg-counter');
+    const userNameBadge = document.getElementById('user-name-badge');
+    const userAvatarBadge = document.getElementById('user-avatar-badge');
+    const chatFooterBar = document.getElementById('chat-footer-bar');
+
+    const pageNavBtn = document.getElementById('page-nav-btn');
+    const pageNavIcon = document.getElementById('page-nav-icon');
+    const pageNavLabel = document.getElementById('page-nav-label');
+    const viewChat = document.getElementById('view-chat');
+    const viewPhotos = document.getElementById('view-photos');
+    const photoGrid = document.getElementById('photo-grid');
+    const photoCountBadge = document.getElementById('photo-count-badge');
+    const photoEmptyState = document.getElementById('photo-empty-state');
+
+    // Photo Modal Elements
+    const uploadPhotoModal = document.getElementById('upload-photo-modal');
+    const openUploadBtn = document.getElementById('open-upload-btn');
+    const chatUploadPhotoBtn = document.getElementById('chat-upload-photo-btn');
+    const closeUploadModalBtn = document.getElementById('close-upload-modal-btn');
+    const cancelUploadBtn = document.getElementById('cancel-upload-btn');
+    const submitUploadBtn = document.getElementById('submit-upload-btn');
+    const photoFileInput = document.getElementById('photo-file-input');
+    const photoDropZone = document.getElementById('photo-drop-zone');
+    const uploadPlaceholder = document.getElementById('upload-placeholder');
+    const uploadPreviewContainer = document.getElementById('upload-preview-container');
+    const uploadPreviewImg = document.getElementById('upload-preview-img');
+    const aiScanStatus = document.getElementById('ai-scan-status');
+    const aiScanLaser = document.getElementById('ai-scan-laser');
+    const changePhotoBtn = document.getElementById('change-photo-btn');
+    const photoCaptionInput = document.getElementById('photo-caption-input');
+
+    let currentSelectedFile = null;
+    let currentPhotoDataUrl = null;
+    let isSelectedPhotoSafe = false;
+
+    // Keyboard Engine
+    const customKeyboardDrawer = document.getElementById('custom-keyboard-drawer');
+    const customKeyboardToggle = document.getElementById('custom-keyboard-toggle');
+    const closeCustomKeyboard = document.getElementById('close-custom-keyboard');
+    const kbShiftBtn = document.getElementById('kb-shift-btn');
+    const kbBackspaceBtn = document.getElementById('kb-backspace-btn');
+    const kbSpaceBtn = document.getElementById('kb-space-btn');
+    const kbSendBtn = document.getElementById('kb-send-btn');
+
+    let isKeyboardOpen = false;
+    let isCapsActive = false;
+    let currentKeyboardTarget = messageInput;
+
+    function openCustomKeyboard(targetInput = messageInput) {
+      currentKeyboardTarget = targetInput || messageInput;
+      isKeyboardOpen = true;
+      if (customKeyboardDrawer) {
+        customKeyboardDrawer.classList.remove('translate-y-full');
+      }
+      if (chatFooterBar && currentTab === 'chat') {
+        chatFooterBar.style.paddingBottom = '210px';
+      }
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+
+    function hideCustomKeyboard() {
+      isKeyboardOpen = false;
+      if (customKeyboardDrawer) {
+        customKeyboardDrawer.classList.add('translate-y-full');
+      }
+      if (chatFooterBar) {
+        chatFooterBar.style.paddingBottom = '';
+      }
+    }
+
+    function toggleCapsState() {
+      isCapsActive = !isCapsActive;
+      if (kbShiftBtn) {
+        kbShiftBtn.className = isCapsActive
+          ? 'kb-key flex-[1.3] min-w-0 h-8 sm:h-9 bg-indigo-600 text-white font-black rounded-lg shadow text-xs flex items-center justify-center cursor-pointer ring-1 ring-indigo-400'
+          : 'kb-key flex-[1.3] min-w-0 h-8 sm:h-9 bg-slate-700 hover:bg-slate-600 active:bg-indigo-600 text-white font-black rounded-lg shadow-xs text-xs flex items-center justify-center cursor-pointer';
+      }
+      document.querySelectorAll('.kb-char').forEach(btn => {
+        const txt = btn.textContent;
+        if (isNaN(txt)) {
+          btn.textContent = isCapsActive ? txt.toUpperCase() : txt.toLowerCase();
+        }
+      });
+    }
+
+    function insertChar(char) {
+      if (!currentKeyboardTarget) currentKeyboardTarget = messageInput;
+      const start = currentKeyboardTarget.selectionStart ?? currentKeyboardTarget.value.length;
+      const end = currentKeyboardTarget.selectionEnd ?? currentKeyboardTarget.value.length;
+      const val = currentKeyboardTarget.value;
+      currentKeyboardTarget.value = val.substring(0, start) + char + val.substring(end);
+      currentKeyboardTarget.selectionStart = currentKeyboardTarget.selectionEnd = start + char.length;
+      currentKeyboardTarget.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function handleBackspace() {
+      if (!currentKeyboardTarget) currentKeyboardTarget = messageInput;
+      const start = currentKeyboardTarget.selectionStart ?? currentKeyboardTarget.value.length;
+      const end = currentKeyboardTarget.selectionEnd ?? currentKeyboardTarget.value.length;
+      const val = currentKeyboardTarget.value;
+      if (start === end) {
+        if (start > 0) {
+          currentKeyboardTarget.value = val.substring(0, start - 1) + val.substring(end);
+          currentKeyboardTarget.selectionStart = currentKeyboardTarget.selectionEnd = start - 1;
+        }
+      } else {
+        currentKeyboardTarget.value = val.substring(0, start) + val.substring(end);
+        currentKeyboardTarget.selectionStart = currentKeyboardTarget.selectionEnd = start;
+      }
+      currentKeyboardTarget.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    if (customKeyboardToggle) {
+      customKeyboardToggle.addEventListener('click', () => {
+        if (isKeyboardOpen) hideCustomKeyboard();
+        else openCustomKeyboard(messageInput);
+      });
+    }
+
+    if (closeCustomKeyboard) closeCustomKeyboard.addEventListener('click', hideCustomKeyboard);
+    if (kbShiftBtn) kbShiftBtn.addEventListener('click', toggleCapsState);
+    if (kbBackspaceBtn) kbBackspaceBtn.addEventListener('click', handleBackspace);
+    if (kbSpaceBtn) kbSpaceBtn.addEventListener('click', () => insertChar(' '));
+
+    if (kbSendBtn) {
+      kbSendBtn.addEventListener('click', () => {
+        if (currentKeyboardTarget === messageInput && chatForm) {
+          chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      });
+    }
+
+    document.querySelectorAll('.kb-char').forEach(btn => {
+      btn.addEventListener('click', () => insertChar(btn.textContent));
+    });
+
+    function deleteMessageAsMod(msgId) {
+      if (!isSuperModActive) return;
+      allMessages = allMessages.filter(m => m.id !== msgId);
+      renderMessages();
+      showToast('🗑️ Message deleted');
+    }
+
+    function deletePhotoAsMod(photoId) {
+      if (!isSuperModActive) return;
+      allPhotos = allPhotos.filter(p => p.id !== photoId);
+      renderPhotos();
+      showToast('🗑️ Photo removed');
+    }
+
+    window.chatteerDeletePhoto = deletePhotoAsMod;
+    window.chatteerDeleteMsg = deleteMessageAsMod;
+
+    function renderMessages() {
+      if (!messagesList) return;
+      messagesList.innerHTML = '';
+      if (loadingElem) loadingElem.classList.add('hidden');
+
+      const valid = allMessages.filter(m => !isUserBanned(m.userName));
+      if (valid.length === 0) {
+        if (welcomeBanner) welcomeBanner.classList.remove('hidden');
+        if (msgCounter) msgCounter.textContent = '0 msgs';
+        return;
+      }
+      if (welcomeBanner) welcomeBanner.classList.add('hidden');
+      if (msgCounter) msgCounter.textContent = `${valid.length} msgs`;
+
+      valid.forEach(msg => {
+        const isMe = msg.userName === myProfile.name;
+        const row = document.createElement('div');
+        row.className = `flex items-end gap-1.5 ${isMe ? 'justify-end' : 'justify-start'}`;
+
+        const avatar = `<div class="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-xs shrink-0 select-none">${escapeHtml(msg.userAvatar || '🚀')}</div>`;
+        const bubble = document.createElement('div');
+        bubble.className = `max-w-[85%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+
+        const modButtons = isSuperModActive ? `
+          <span class="inline-flex items-center gap-1 ml-1.5">
+            <button type="button" onclick="window.chatteerDeleteMsg('${msg.id}')" title="Delete Message" class="text-[10px] text-red-500 hover:text-red-700 font-bold px-1 rounded hover:bg-red-50 cursor-pointer">
+              🗑️
+            </button>
+            <button type="button" onclick="window.chatteerBanUser('${msg.userName}')" title="Ban User" class="text-[10px] text-red-600 hover:text-red-800 font-bold px-1 rounded hover:bg-red-50 cursor-pointer">
+              🚫
+            </button>
+          </span>
+        ` : '';
+
+        const formattedText = formatLinksAsHashtags(msg.text || '');
+
+        bubble.innerHTML = `
+          <div class="flex items-center text-[9px] text-slate-400 mb-0.5 px-1">
+            <span>@${escapeHtml(msg.userName)} • ${formatTime(msg.createdAt)}</span>
+            ${modButtons}
+          </div>
+          <div class="px-3 py-1.5 rounded-xl ${isMe ? 'bg-indigo-600 text-white rounded-br-xs' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-xs'} text-xs break-words">
+            ${formattedText}
+          </div>
+        `;
+
+        if (isMe) {
+          row.appendChild(bubble);
+          row.insertAdjacentHTML('beforeend', avatar);
+        } else {
+          row.insertAdjacentHTML('afterbegin', avatar);
+          row.appendChild(bubble);
+        }
+        messagesList.appendChild(row);
+      });
+
+      if (isAutoScrollActive && chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+
+    async function connectToServer(room) {
+      currentRoom = room;
+      if (statusText) statusText.textContent = 'Live';
+      if (activeEventSource) activeEventSource.close();
+
+      try {
+        const res = await fetch(`https://ntfy.sh/${getRoomTopic(room)}/json?poll=1`);
+        if (res.ok) {
+          const text = await res.text();
+          const loaded = [];
+          text.trim().split('\n').forEach(line => {
+            if (!line) return;
+            try {
+              const entry = JSON.parse(line);
+              if (entry.event === 'message' && entry.message) {
+                const p = JSON.parse(entry.message);
+                if (p.type === 'system_purge_all') {
+                  purgeAllUploadedDataLocally();
+                  return;
+                }
+                if (p.type === 'chat_msg' && !isUserBanned(p.userName)) loaded.push(p);
+              }
+            } catch(e){}
+          });
+          allMessages = loaded.sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+          renderMessages();
+        }
+      } catch (e) {
+        renderMessages();
+      }
+
+      try {
+        activeEventSource = new EventSource(`https://ntfy.sh/${getRoomTopic(room)}/sse`);
+        activeEventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.event === 'message' && data.message) {
+              const payload = JSON.parse(data.message);
+              if (payload.type === 'system_purge_all') {
+                purgeAllUploadedDataLocally();
+                showToast('💥 All messages purged.');
+                return;
+              }
+              if (payload.type === 'chat_msg' && !isUserBanned(payload.userName)) {
+                if (!allMessages.some(m => m.id === payload.id)) {
+                  allMessages.push(payload);
+                  renderMessages();
+                }
+              }
+            }
+          } catch(e){}
+        };
+      } catch (e) {}
+    }
+
+    async function connectToPhotosServer() {
+      if (photosEventSource) photosEventSource.close();
+
+      try {
+        const res = await fetch(`https://ntfy.sh/${getPhotosTopic()}/json?poll=1`);
+        if (res.ok) {
+          const text = await res.text();
+          const loaded = [];
+          text.trim().split('\n').forEach(line => {
+            if (!line) return;
+            try {
+              const entry = JSON.parse(line);
+              if (entry.event === 'message') {
+                if (entry.message) {
+                  const p = JSON.parse(entry.message);
+                  if (p.type === 'photo_upload' && !isUserBanned(p.author)) loaded.push(p);
+                } else if (entry.attachment && entry.attachment.url) {
+                  const author = entry.title || 'chatteer_user';
+                  if (!isUserBanned(author)) {
+                    loaded.push({
+                      id: entry.id || ('photo_' + entry.time),
+                      url: entry.attachment.url,
+                      caption: '',
+                      author: author,
+                      authorAvatar: '📸',
+                      createdAt: entry.time * 1000,
+                      type: 'photo_upload'
+                    });
+                  }
+                }
+              }
+            } catch(e){}
+          });
+          allPhotos = loaded.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+          renderPhotos();
+        }
+      } catch(e){
+        renderPhotos();
+      }
+
+      try {
+        photosEventSource = new EventSource(`https://ntfy.sh/${getPhotosTopic()}/sse`);
+        photosEventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.event === 'message' && data.message) {
+              const payload = JSON.parse(data.message);
+              if (payload.type === 'photo_upload' && !isUserBanned(payload.author)) {
+                if (!allPhotos.some(p => p.id === payload.id)) {
+                  allPhotos.unshift(payload);
+                  renderPhotos();
+                }
+              }
+            }
+          } catch(e){}
+        };
+      } catch(e){}
+    }
+
+    async function sendChatMessage(text) {
+      if (isUserBanned(myProfile.name)) return;
+      if (!text) return;
+
+      const scan = await scanContentPreFlight(text);
+      if (!scan.passed) return;
+
+      const newMsg = {
+        id: 'msg_' + Date.now(),
+        roomId: currentRoom,
+        userName: myProfile.name,
+        userAvatar: myProfile.avatar,
+        text: text,
+        createdAt: Date.now(),
+        type: 'chat_msg'
+      };
+
+      allMessages.push(newMsg);
+      renderMessages();
+
+      try {
+        await fetch(`https://ntfy.sh/${getRoomTopic(currentRoom)}`, {
+          method: 'POST',
+          body: JSON.stringify(newMsg)
+        });
+      } catch (e) {}
+    }
+
+    if (chatForm && messageInput && sendButton) {
+      messageInput.addEventListener('input', () => {
+        sendButton.disabled = messageInput.value.trim().length === 0;
+      });
+
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = messageInput.value.trim();
+        if (!text) return;
+        sendChatMessage(text);
+        messageInput.value = '';
+        sendButton.disabled = true;
+      });
+    }
+
+    document.querySelectorAll('.room-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.room-btn').forEach(b => {
+          b.className = 'room-btn px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 text-xs cursor-pointer';
+        });
+        btn.className = 'room-btn active px-2.5 py-0.5 rounded-lg bg-indigo-100/70 text-indigo-700 border border-indigo-300 font-semibold text-xs cursor-pointer';
+        const room = btn.getAttribute('data-room') || 'global';
+        connectToServer(room);
+      });
+    });
+
+    if (pageNavBtn && viewChat && viewPhotos) {
+      pageNavBtn.addEventListener('click', () => {
+        if (currentTab === 'chat') {
+          currentTab = 'photos';
+          viewChat.classList.add('hidden');
+          viewPhotos.classList.remove('hidden');
+          pageNavIcon.textContent = '💬';
+          pageNavLabel.textContent = 'Chat';
+          hideCustomKeyboard();
+          renderPhotos();
+        } else {
+          currentTab = 'chat';
+          viewPhotos.classList.add('hidden');
+          viewChat.classList.remove('hidden');
+          pageNavIcon.textContent = '📸';
+          pageNavLabel.textContent = 'Photos';
+        }
+      });
+    }
+
+    // Image AI scan simulation
+    async function scanImageFileWithAI(file) {
+      return new Promise((resolve) => {
+        if (!file || !file.type.startsWith('image/')) {
+          resolve({ safe: false, reason: 'Invalid file format' });
+          return;
+        }
+
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve({ safe: true });
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve({ safe: false, reason: 'Unable to read image' });
+        };
+
+        img.src = objectUrl;
+      });
+    }
+
+    function compressImageFile(file, maxWidth = 800, quality = 0.75) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width;
+            let h = img.height;
+
+            if (w > maxWidth) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
+            }
+
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function openPhotoModal() {
+      if (uploadPhotoModal) {
+        resetPhotoUploadForm();
+        uploadPhotoModal.classList.remove('hidden');
+      }
+    }
+
+    function resetPhotoUploadForm() {
+      currentSelectedFile = null;
+      currentPhotoDataUrl = null;
+      isSelectedPhotoSafe = false;
+      if (photoFileInput) photoFileInput.value = '';
+      if (photoCaptionInput) photoCaptionInput.value = '';
+      if (uploadPlaceholder) uploadPlaceholder.classList.remove('hidden');
+      if (uploadPreviewContainer) uploadPreviewContainer.classList.add('hidden');
+      if (uploadPreviewImg) uploadPreviewImg.src = '';
+      if (submitUploadBtn) submitUploadBtn.disabled = true;
+    }
+
+    async function handleFileSelected(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        showToast('Please select an image file', 'error');
+        return;
+      }
+
+      currentSelectedFile = file;
+
+      if (uploadPlaceholder) uploadPlaceholder.classList.add('hidden');
+      if (uploadPreviewContainer) uploadPreviewContainer.classList.remove('hidden');
+      if (aiScanLaser) aiScanLaser.classList.remove('hidden');
+      if (aiScanStatus) {
+        aiScanStatus.className = 'py-1 px-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200';
+        aiScanStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span><span>AI Guardian: Scanning pixels...</span>';
+      }
+
+      const previewUrl = URL.createObjectURL(file);
+      if (uploadPreviewImg) uploadPreviewImg.src = previewUrl;
+
+      const scanResult = await scanImageFileWithAI(file);
+      if (aiScanLaser) aiScanLaser.classList.add('hidden');
+
+      if (!scanResult.safe) {
+        isSelectedPhotoSafe = false;
+        if (submitUploadBtn) submitUploadBtn.disabled = true;
+        if (aiScanStatus) {
+          aiScanStatus.className = 'py-1 px-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-red-50 text-red-700 border border-red-200';
+          aiScanStatus.innerHTML = `<span>🚫 Rejected: ${escapeHtml(scanResult.reason)}</span>`;
+        }
+      } else {
+        isSelectedPhotoSafe = true;
+        if (submitUploadBtn) submitUploadBtn.disabled = false;
+        if (aiScanStatus) {
+          aiScanStatus.className = 'py-1 px-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200';
+          aiScanStatus.innerHTML = '<span>✅ AI Verified: Safe to Post</span>';
+        }
+        currentPhotoDataUrl = await compressImageFile(file);
+      }
+    }
+
+    if (openUploadBtn) openUploadBtn.addEventListener('click', openPhotoModal);
+    if (chatUploadPhotoBtn) chatUploadPhotoBtn.addEventListener('click', openPhotoModal);
+    if (closeUploadModalBtn) closeUploadModalBtn.addEventListener('click', () => uploadPhotoModal.classList.add('hidden'));
+    if (cancelUploadBtn) cancelUploadBtn.addEventListener('click', () => uploadPhotoModal.classList.add('hidden'));
+
+    if (photoDropZone && photoFileInput) {
+      photoDropZone.addEventListener('click', (e) => {
+        if (e.target !== changePhotoBtn && !uploadPreviewContainer.classList.contains('hidden') && e.target === uploadPreviewImg) {
+          return;
+        }
+        photoFileInput.click();
+      });
+
+      photoFileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          handleFileSelected(e.target.files[0]);
+        }
+      });
+    }
+
+    if (changePhotoBtn && photoFileInput) {
+      changePhotoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        photoFileInput.click();
+      });
+    }
+
+    if (submitUploadBtn) {
+      submitUploadBtn.addEventListener('click', async () => {
+        if (!currentSelectedFile || !isSelectedPhotoSafe || !currentPhotoDataUrl) {
+          showToast('Please select a safe photo first', 'error');
+          return;
+        }
+
+        const caption = photoCaptionInput ? photoCaptionInput.value.trim() : '';
+        if (caption) {
+          const scan = await scanContentPreFlight(caption);
+          if (!scan.passed) return;
+        }
+
+        submitUploadBtn.disabled = true;
+        submitUploadBtn.textContent = 'Posting...';
+
+        const newPhoto = {
+          id: 'photo_' + Date.now(),
+          url: currentPhotoDataUrl,
+          caption: caption,
+          author: myProfile.name,
+          authorAvatar: myProfile.avatar,
+          createdAt: Date.now(),
+          type: 'photo_upload'
+        };
+
+        allPhotos.unshift(newPhoto);
+        renderPhotos();
+
+        try {
+          await fetch(`https://ntfy.sh/${getPhotosTopic()}`, {
+            method: 'POST',
+            body: JSON.stringify(newPhoto)
+          });
+        } catch (e) {}
+
+        uploadPhotoModal.classList.add('hidden');
+        resetPhotoUploadForm();
+        submitUploadBtn.textContent = 'Post Photo';
+        showToast('📸 Photo uploaded!');
+
+        if (currentTab === 'chat' && pageNavBtn) {
+          pageNavBtn.click();
+        }
+      });
+    }
+
+    function renderPhotos() {
+      if (!photoGrid) return;
+      photoGrid.innerHTML = '';
+      const valid = allPhotos.filter(p => !isUserBanned(p.author));
+      if (photoCountBadge) photoCountBadge.textContent = `${valid.length} photos`;
+
+      if (valid.length === 0) {
+        if (photoEmptyState) photoEmptyState.classList.remove('hidden');
+        return;
+      }
+      if (photoEmptyState) photoEmptyState.classList.add('hidden');
+
+      valid.forEach(photo => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs flex flex-col';
+
+        const modDelBtn = isSuperModActive ? `
+          <button type="button" onclick="window.chatteerDeletePhoto('${photo.id}')" class="text-[10px] text-red-600 bg-red-50 hover:bg-red-100 font-bold px-1.5 py-0.5 rounded cursor-pointer">
+            🗑 Delete
+          </button>
+        ` : '';
+
+        card.innerHTML = `
+          <div class="aspect-square bg-slate-100 relative overflow-hidden">
+            <img src="${escapeHtml(photo.url)}" alt="chatteer photo" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'%23f1f5f9\\'/><text x=\\'50\\' y=\\'55\\' font-size=\\'12\\' text-anchor=\\'middle\\' fill=\\'%2394a3b8\\'>Image</text></svg>'" />
+          </div>
+          <div class="p-2 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-800 truncate">@${escapeHtml(photo.author)}</span>
+              ${modDelBtn}
+            </div>
+            ${photo.caption ? `<p class="text-[11px] text-slate-600 line-clamp-2">${formatLinksAsHashtags(photo.caption)}</p>` : ''}
+          </div>
+        `;
+        photoGrid.appendChild(card);
+      });
+    }
+
+    function updateProfileUI() {
+      if (userNameBadge) userNameBadge.textContent = `@${myProfile.name}`;
+      if (userAvatarBadge) userAvatarBadge.textContent = myProfile.avatar;
+    }
+
+    function escapeHtml(text) {
+      return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatTime(timestamp) {
+      return new Date(timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const t = document.createElement('div');
+      t.className = `px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow ${type === 'error' ? 'bg-red-600' : 'bg-slate-900'}`;
+      t.textContent = msg;
+      container.appendChild(t);
+      setTimeout(() => t.remove(), 2500);
+    }
+
+    document.querySelectorAll('.quick-emoji').forEach(btn => {
+      btn.addEventListener('click', () => {
+        insertChar(btn.textContent.trim());
+      });
+    });
+
+    // Rules Modal Handling
+    const rulesGateModal = document.getElementById('rules-gate-modal');
+    const rulesScrollBox = document.getElementById('rules-scroll-box');
+    const rulesAgreeCheckbox = document.getElementById('rules-agree-checkbox');
+    const enterChatteerBtn = document.getElementById('enter-chatteer-btn');
+    const scrollDownNotice = document.getElementById('scroll-down-notice');
+    const viewRulesBtn = document.getElementById('view-rules-btn');
+
+    let hasScrolledToRulesBottom = false;
+
+    function checkRulesGate() {
+      const accepted = localStorage.getItem('chatteer_rules_accepted');
+      if (accepted === 'true') {
+        if (rulesGateModal) rulesGateModal.classList.add('hidden');
+      } else {
+        if (rulesGateModal) rulesGateModal.classList.remove('hidden');
+      }
+    }
+
+    if (rulesScrollBox) {
+      rulesScrollBox.addEventListener('scroll', () => {
+        const atBottom = (rulesScrollBox.scrollHeight - rulesScrollBox.scrollTop) <= (rulesScrollBox.clientHeight + 30);
+        if (atBottom && !hasScrolledToRulesBottom) {
+          hasScrolledToRulesBottom = true;
+          if (rulesAgreeCheckbox) rulesAgreeCheckbox.disabled = false;
+          if (scrollDownNotice) {
+            scrollDownNotice.innerHTML = '<span>✅</span> All guidelines read. Check the box to enter!';
+            scrollDownNotice.className = 'text-[11px] text-emerald-600 font-bold flex items-center gap-1';
+          }
+        }
+      });
+    }
+
+    if (rulesAgreeCheckbox && enterChatteerBtn) {
+      rulesAgreeCheckbox.addEventListener('change', () => {
+        enterChatteerBtn.disabled = !rulesAgreeCheckbox.checked;
+      });
+    }
+
+    if (enterChatteerBtn && rulesGateModal) {
+      enterChatteerBtn.addEventListener('click', () => {
+        if (rulesAgreeCheckbox && rulesAgreeCheckbox.checked) {
+          try {
+            localStorage.setItem('chatteer_rules_accepted', 'true');
+          } catch (e) {}
+          rulesGateModal.classList.add('hidden');
+          showToast('🎉 Welcome to Chatteer!');
+        }
+      });
+    }
+
+    if (viewRulesBtn && rulesGateModal) {
+      viewRulesBtn.addEventListener('click', () => {
+        rulesGateModal.classList.remove('hidden');
+        if (rulesAgreeCheckbox) {
+          rulesAgreeCheckbox.disabled = false;
+          rulesAgreeCheckbox.checked = true;
+        }
+        if (enterChatteerBtn) {
+          enterChatteerBtn.disabled = false;
+          enterChatteerBtn.innerHTML = '<span>Close Rules</span> <span>✓</span>';
+        }
+      });
+    }
+
+    // Initialize application
+    loadBannedUsers();
+    initIdentity();
+    checkRulesGate();
+    connectToServer(currentRoom);
+    connectToPhotosServer();
+  </script>
+</body>
+</html>
